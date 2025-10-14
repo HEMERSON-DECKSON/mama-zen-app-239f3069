@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WelcomeGreeting from '@/components/WelcomeGreeting';
 import MusicPlayer from '@/components/MusicPlayer';
 import RoutineCalendar from '@/components/RoutineCalendar';
@@ -6,9 +6,33 @@ import GuideLibrary from '@/components/GuideLibrary';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, Music, Calendar, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('');
+  const [tempName, setTempName] = useState<string>('');
+  const [showNameDialog, setShowNameDialog] = useState<boolean>(false);
+
+  useEffect(() => {
+    const savedName = localStorage.getItem('userName');
+    if (savedName) {
+      setUserName(savedName);
+    } else {
+      setShowNameDialog(true);
+    }
+  }, []);
+
+  const handleNameSubmit = () => {
+    if (tempName.trim()) {
+      setUserName(tempName.trim());
+      localStorage.setItem('userName', tempName.trim());
+      setShowNameDialog(false);
+      toast.success(`Bem-vinda, ${tempName.trim()}! Sua jornada começa agora! 💝`);
+    }
+  };
 
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood);
@@ -25,7 +49,36 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-center">Bem-vinda! 🌸</DialogTitle>
+            <DialogDescription className="text-center text-base pt-2">
+              Informe o seu nome para que eu possa criar uma rotina especial para você
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Input
+              placeholder="Digite seu nome..."
+              value={tempName}
+              onChange={(e) => setTempName(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleNameSubmit()}
+              className="text-center text-lg"
+              autoFocus
+            />
+            <Button 
+              onClick={handleNameSubmit} 
+              disabled={!tempName.trim()}
+              className="w-full"
+            >
+              Começar Minha Jornada ✨
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-border shadow-sm">
         <div className="container mx-auto px-4 py-4">
@@ -46,9 +99,11 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Greeting Section */}
-        <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <WelcomeGreeting userName="Letícia" onMoodSelect={handleMoodSelect} />
-        </div>
+        {userName && (
+          <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <WelcomeGreeting userName={userName} onMoodSelect={handleMoodSelect} />
+          </div>
+        )}
 
         {/* Tabs Navigation */}
         <Tabs defaultValue="routine" className="w-full">
@@ -96,7 +151,8 @@ const Index = () => {
           </p>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   );
 };
 
