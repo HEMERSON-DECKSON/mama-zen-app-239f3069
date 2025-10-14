@@ -1,24 +1,108 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward, SkipBack, Music, Volume2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { toast } from 'sonner';
 
 const sleepTracks = [
-  { id: 1, title: 'Chuva Suave', duration: '45:00', category: 'Natureza' },
-  { id: 2, title: 'Ninar do Bebê', duration: '30:00', category: 'Melodias' },
-  { id: 3, title: 'Ondas do Mar', duration: '60:00', category: 'Natureza' },
-  { id: 4, title: 'Piano Relaxante', duration: '40:00', category: 'Melodias' },
-  { id: 5, title: 'Floresta Encantada', duration: '50:00', category: 'Natureza' },
+  { 
+    id: 1, 
+    title: 'Chuva Suave na Floresta', 
+    duration: '45:00', 
+    category: 'Natureza',
+    url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_4a426a06d6.mp3'
+  },
+  { 
+    id: 2, 
+    title: 'Correnteza Tranquila', 
+    duration: '30:00', 
+    category: 'Natureza',
+    url: 'https://cdn.pixabay.com/download/audio/2022/05/13/audio_88ef43c171.mp3'
+  },
+  { 
+    id: 3, 
+    title: 'Ondas do Mar Calmo', 
+    duration: '60:00', 
+    category: 'Natureza',
+    url: 'https://cdn.pixabay.com/download/audio/2022/06/07/audio_9a7e2c6e2c.mp3'
+  },
+  { 
+    id: 4, 
+    title: 'Chuva com Trovoada Distante', 
+    duration: '40:00', 
+    category: 'Natureza',
+    url: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_8c66df4173.mp3'
+  },
+  { 
+    id: 5, 
+    title: 'Riacho na Montanha', 
+    duration: '50:00', 
+    category: 'Natureza',
+    url: 'https://cdn.pixabay.com/download/audio/2022/03/24/audio_2e3f6c1e2c.mp3'
+  },
 ];
 
 const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [volume, setVolume] = useState([70]);
+  const [progress, setProgress] = useState([0]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const track = sleepTracks[currentTrack];
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume[0] / 100;
+    }
+  }, [volume]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.load();
+      setProgress([0]);
+      setIsPlaying(false);
+    }
+  }, [currentTrack]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateProgress = () => {
+      const value = (audio.currentTime / audio.duration) * 100;
+      setProgress([isNaN(value) ? 0 : value]);
+    };
+
+    const handleEnded = () => {
+      handleNext();
+    };
+
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateProgress);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [currentTrack]);
 
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().catch((error) => {
+        console.error('Erro ao reproduzir áudio:', error);
+        toast.error('Erro ao reproduzir música. Tente novamente.');
+      });
+      setIsPlaying(true);
+      toast.success(`🎵 Tocando: ${track.title}`);
+    }
   };
 
   const handleNext = () => {
@@ -29,10 +113,23 @@ const MusicPlayer = () => {
     setCurrentTrack((prev) => (prev - 1 + sleepTracks.length) % sleepTracks.length);
   };
 
-  const track = sleepTracks[currentTrack];
+  const handleProgressChange = (value: number[]) => {
+    if (!audioRef.current) return;
+    const time = (value[0] / 100) * audioRef.current.duration;
+    audioRef.current.currentTime = time;
+    setProgress(value);
+  };
+
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
     <Card className="overflow-hidden border-0 shadow-[var(--shadow-soft)] bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10">
+      <audio ref={audioRef} src={track.url} preload="metadata" />
       <div className="p-6">
         <div className="flex items-center gap-3 mb-6">
           <Music className="w-6 h-6 text-primary" />
@@ -54,14 +151,15 @@ const MusicPlayer = () => {
           {/* Progress Bar */}
           <div className="mb-4">
             <Slider
-              value={[35]}
+              value={progress}
+              onValueChange={handleProgressChange}
               max={100}
-              step={1}
+              step={0.1}
               className="w-full"
             />
             <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>15:30</span>
-              <span>{track.duration}</span>
+              <span>{formatTime(audioRef.current?.currentTime || 0)}</span>
+              <span>{formatTime(audioRef.current?.duration || 0)}</span>
             </div>
           </div>
 

@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronRight, Heart } from 'lucide-react';
 import { useState } from 'react';
+import ChapterDialog from './ChapterDialog';
 
 const chapters = [
   { id: 1, title: 'O Começo da Jornada', subtitle: 'Entendendo o Seu Corpo Pós-Parto', emoji: '🌸' },
@@ -23,11 +24,18 @@ const chapters = [
 
 const GuideLibrary = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [selectedChapter, setSelectedChapter] = useState<typeof chapters[0] | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const toggleFavorite = (id: number) => {
     setFavorites(prev => 
       prev.includes(id) ? prev.filter(fav => fav !== id) : [...prev, id]
     );
+  };
+
+  const openChapter = (chapter: typeof chapters[0]) => {
+    setSelectedChapter(chapter);
+    setDialogOpen(true);
   };
 
   return (
@@ -79,6 +87,7 @@ const GuideLibrary = () => {
                     variant="ghost" 
                     size="sm"
                     className="h-8 px-3 text-primary hover:text-primary hover:bg-primary/10 -ml-3"
+                    onClick={() => openChapter(chapter)}
                   >
                     Ler capítulo
                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -95,6 +104,12 @@ const GuideLibrary = () => {
           </p>
         </div>
       </div>
+      
+      <ChapterDialog 
+        chapter={selectedChapter}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </Card>
   );
 };
