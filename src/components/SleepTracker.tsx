@@ -105,33 +105,33 @@ export default function SleepTracker() {
 
   return (
     <Card className="border-primary/20 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
-        <CardTitle className="text-2xl flex items-center gap-2">
-          <Moon className="w-6 h-6" />
-          Rastreador de Sono
+      <CardHeader className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Moon className="w-5 h-5" />
+          Tracker de Sono
         </CardTitle>
-        <CardDescription>
-          Monitore os padrões de sono do seu bebê
+        <CardDescription className="text-xs">
+          Monitore o sono do bebê
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6 space-y-6">
+      <CardContent className="pt-4 space-y-4">
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-              <Clock className="w-4 h-4" />
-              Sono Total Hoje
+        <div className="grid grid-cols-2 gap-2">
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+              <Clock className="w-3 h-3" />
+              Total Hoje
             </div>
-            <div className="text-2xl font-bold">
+            <div className="text-lg font-bold">
               {formatDuration(totalSleepToday)}
             </div>
           </div>
-          <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-              <TrendingUp className="w-4 h-4" />
-              Sessões Hoje
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+              <TrendingUp className="w-3 h-3" />
+              Sessões
             </div>
-            <div className="text-2xl font-bold">
+            <div className="text-lg font-bold">
               {todayEntries.length}
             </div>
           </div>
@@ -139,46 +139,44 @@ export default function SleepTracker() {
 
         {/* Controls */}
         {currentSleep ? (
-          <div className="p-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-300 dark:border-blue-800 space-y-4">
+          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-300 dark:border-blue-800 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold text-lg">
-                  {currentSleep.type === 'night' ? '🌙 Dormindo...' : '😴 Soneca em andamento...'}
+                <p className="font-semibold text-sm">
+                  {currentSleep.type === 'night' ? '🌙 Dormindo...' : '😴 Soneca...'}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Início: {formatTime(currentSleep.startTime)}
                 </p>
               </div>
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
             </div>
-            <Button onClick={endSleep} className="w-full" size="lg">
-              Acordou! Registrar fim do sono
+            <Button onClick={endSleep} className="w-full text-sm" size="sm">
+              Acordou! Registrar
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={() => startSleep('night')}
               variant="default"
-              size="lg"
-              className="h-auto py-6 flex-col gap-2"
+              size="sm"
+              className="h-auto py-4 flex-col gap-1.5"
             >
-              <Moon className="w-8 h-8" />
-              <div>
-                <div className="font-semibold">Sono Noturno</div>
-                <div className="text-xs opacity-80">Sono da noite</div>
+              <Moon className="w-5 h-5" />
+              <div className="text-center">
+                <div className="font-semibold text-xs">Sono Noturno</div>
               </div>
             </Button>
             <Button
               onClick={() => startSleep('nap')}
               variant="outline"
-              size="lg"
-              className="h-auto py-6 flex-col gap-2"
+              size="sm"
+              className="h-auto py-4 flex-col gap-1.5"
             >
-              <Sun className="w-8 h-8" />
-              <div>
-                <div className="font-semibold">Soneca</div>
-                <div className="text-xs opacity-80">Sono diurno</div>
+              <Sun className="w-5 h-5" />
+              <div className="text-center">
+                <div className="font-semibold text-xs">Soneca</div>
               </div>
             </Button>
           </div>
@@ -186,33 +184,33 @@ export default function SleepTracker() {
 
         {/* History */}
         {todayEntries.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-semibold flex items-center gap-2">
-              📊 Registros de Hoje
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold flex items-center gap-1.5">
+              📊 Hoje
             </h3>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="space-y-1.5 max-h-48 overflow-y-auto">
               {todayEntries.map((entry) => (
                 <div
                   key={entry.id}
-                  className="p-3 rounded-lg bg-card border flex items-center justify-between"
+                  className="p-2 rounded-lg bg-card border flex items-center justify-between text-xs"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     {entry.type === 'night' ? (
-                      <Moon className="w-5 h-5 text-indigo-500" />
+                      <Moon className="w-4 h-4 text-indigo-500" />
                     ) : (
-                      <Sun className="w-5 h-5 text-amber-500" />
+                      <Sun className="w-4 h-4 text-amber-500" />
                     )}
                     <div>
-                      <p className="font-medium text-sm">
-                        {entry.type === 'night' ? 'Sono Noturno' : 'Soneca'}
+                      <p className="font-medium text-xs">
+                        {entry.type === 'night' ? 'Noturno' : 'Soneca'}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : 'Em andamento'}
+                      <p className="text-[10px] text-muted-foreground">
+                        {formatTime(entry.startTime)} - {entry.endTime ? formatTime(entry.endTime) : 'Agora'}
                       </p>
                     </div>
                   </div>
                   {entry.duration && (
-                    <div className="text-sm font-semibold text-primary">
+                    <div className="text-xs font-semibold text-primary">
                       {formatDuration(entry.duration)}
                     </div>
                   )}
@@ -222,9 +220,9 @@ export default function SleepTracker() {
           </div>
         )}
 
-        <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-          <p className="text-sm">
-            <strong>💤 Meta recomendada:</strong> Recém-nascidos: 14-17h/dia | 3-6 meses: 12-15h/dia | 6-12 meses: 12-14h/dia
+        <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+          <p className="text-xs">
+            <strong>💤 Meta:</strong> 0-3m: 14-17h | 3-6m: 12-15h | 6-12m: 12-14h
           </p>
         </div>
       </CardContent>

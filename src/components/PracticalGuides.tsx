@@ -370,39 +370,39 @@ const guides = [
 export default function PracticalGuides() {
   return (
     <Card className="border-primary/20 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10">
-        <div className="flex items-center gap-3">
-          <Baby className="w-8 h-8 text-primary" />
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 pb-3">
+        <div className="flex items-center gap-2">
+          <Baby className="w-6 h-6 text-primary" />
           <div>
-            <CardTitle className="text-2xl">Guias Práticos</CardTitle>
-            <CardDescription>Tudo que você precisa saber para cuidar do seu bebê</CardDescription>
+            <CardTitle className="text-lg">Guias Práticos</CardTitle>
+            <CardDescription className="text-xs">Cuidados essenciais para o bebê</CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
-        <Accordion type="single" collapsible className="w-full space-y-4">
+      <CardContent className="pt-4">
+        <Accordion type="single" collapsible className="w-full space-y-2">
           {guides.map((guide) => {
             const Icon = guide.icon;
             return (
               <AccordionItem 
                 key={guide.id} 
                 value={guide.id}
-                className="border rounded-lg px-4 bg-card/50 hover:bg-card/80 transition-colors"
+                className="border rounded-lg px-3 bg-card/50 hover:bg-card/80 transition-colors"
               >
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="p-2 rounded-full bg-primary/10">
-                      <Icon className="w-5 h-5 text-primary" />
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-2 text-left">
+                    <div className="p-1.5 rounded-full bg-primary/10 flex-shrink-0">
+                      <Icon className="w-4 h-4 text-primary" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold">{guide.title}</h3>
-                      <p className="text-sm text-muted-foreground">{guide.description}</p>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-sm">{guide.title}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{guide.description}</p>
                     </div>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="pt-4 pb-4">
+                <AccordionContent className="pt-2 pb-3">
                   <div 
-                    className="prose prose-sm max-w-none dark:prose-invert"
+                    className="prose prose-sm max-w-none dark:prose-invert text-xs"
                     dangerouslySetInnerHTML={{ __html: guide.content }}
                   />
                 </AccordionContent>

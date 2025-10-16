@@ -137,31 +137,30 @@ export default function BabySounds() {
 
   return (
     <Card className="border-primary/20 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10">
-        <CardTitle className="text-2xl flex items-center gap-2">
-          🎵 Sons Calmantes para Bebê
+      <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          🎵 Sons Calmantes
         </CardTitle>
-        <CardDescription>
-          Sons comprovados cientificamente para acalmar e fazer o bebê dormir
+        <CardDescription className="text-xs">
+          Para acalmar e fazer o bebê dormir
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <CardContent className="pt-4">
+        <div className="grid grid-cols-3 gap-2 mb-4">
           {babySounds.map((sound) => (
             <Button
               key={sound.id}
               variant={currentSound?.id === sound.id ? "default" : "outline"}
-              className="h-auto flex-col gap-2 p-4 relative"
+              className="h-auto flex-col gap-1 p-3 relative text-xs"
               onClick={() => handleSoundSelect(sound)}
             >
-              <span className="text-3xl">{sound.icon}</span>
+              <span className="text-2xl">{sound.icon}</span>
               <div className="text-center">
-                <div className="font-semibold text-sm">{sound.name}</div>
-                <div className="text-xs text-muted-foreground">{sound.description}</div>
+                <div className="font-semibold text-xs leading-tight">{sound.name}</div>
               </div>
               {currentSound?.id === sound.id && isPlaying && (
-                <div className="absolute top-2 right-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="absolute top-1 right-1">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                 </div>
               )}
             </Button>
@@ -169,38 +168,40 @@ export default function BabySounds() {
         </div>
 
         {currentSound && (
-          <div className="space-y-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
+          <div className="space-y-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{currentSound.icon}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{currentSound.icon}</span>
                 <div>
-                  <p className="font-semibold">{currentSound.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold text-sm">{currentSound.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {isPlaying ? "Tocando..." : "Pausado"}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 <Button
                   size="icon"
                   variant={isPlaying ? "default" : "outline"}
                   onClick={() => handleSoundSelect(currentSound)}
+                  className="h-8 w-8"
                 >
-                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                 </Button>
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={handleStop}
+                  className="h-8 w-8 text-xs"
                 >
                   ⏹️
                 </Button>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <Volume2 className="w-4 h-4 text-muted-foreground" />
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Volume2 className="w-3 h-3 text-muted-foreground" />
                 <Slider
                   value={volume}
                   onValueChange={setVolume}
@@ -208,7 +209,7 @@ export default function BabySounds() {
                   step={1}
                   className="flex-1"
                 />
-                <span className="text-sm text-muted-foreground w-12 text-right">
+                <span className="text-xs text-muted-foreground w-10 text-right">
                   {volume[0]}%
                 </span>
               </div>
@@ -216,9 +217,9 @@ export default function BabySounds() {
           </div>
         )}
 
-        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <p className="text-sm">
-            <strong>💡 Dica:</strong> Sons entre 50-70dB são ideais. Use em conjunto com as técnicas de acalmar do bebê para melhores resultados!
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <p className="text-xs">
+            <strong>💡 Dica:</strong> Sons entre 50-70dB são ideais para acalmar o bebê.
           </p>
         </div>
       </CardContent>

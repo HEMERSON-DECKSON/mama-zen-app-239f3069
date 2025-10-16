@@ -84,25 +84,21 @@ const Index = () => {
       </Dialog>
 
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-        <div className="container mx-auto p-4 md:p-8 space-y-8">
+        <div className="w-full max-w-md mx-auto p-4 space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2 animate-fade-in">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <Sparkles className="w-8 h-8 text-pink-500 animate-pulse" />
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <div className="text-center space-y-2 animate-fade-in pt-2">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Sparkles className="w-6 h-6 text-pink-500 animate-pulse" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Mamãe Zen
               </h1>
-              <Sparkles className="w-8 h-8 text-purple-500 animate-pulse" />
+              <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
             </div>
-            <p className="text-muted-foreground text-lg md:text-xl font-medium">
-              ✨ Seu app premium completo para maternidade saudável ✨
+            <p className="text-muted-foreground text-sm font-medium px-4">
+              ✨ App premium de maternidade ✨
             </p>
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">PREMIUM</span>
-              <span className="hidden sm:inline">•</span>
-              <span>Guias Profissionais</span>
-              <span className="hidden sm:inline">•</span>
-              <span>Trackers Inteligentes</span>
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs">PREMIUM</span>
             </div>
           </div>
 
@@ -115,29 +111,66 @@ const Index = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="guides" className="animate-fade-in">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 gap-2">
-              <TabsTrigger value="guides" className="gap-2"><Baby className="w-4 h-4" /><span className="hidden sm:inline">Guias</span></TabsTrigger>
-              <TabsTrigger value="sounds" className="gap-2"><Heart className="w-4 h-4" /><span className="hidden sm:inline">Sons</span></TabsTrigger>
-              <TabsTrigger value="sleep" className="gap-2"><Moon className="w-4 h-4" /><span className="hidden sm:inline">Sono</span></TabsTrigger>
-              <TabsTrigger value="feeding" className="gap-2"><Milk className="w-4 h-4" /><span className="hidden sm:inline">Mamar</span></TabsTrigger>
-              <TabsTrigger value="routine" className="gap-2"><Calendar className="w-4 h-4" /><span className="hidden sm:inline">Rotina</span></TabsTrigger>
-              <TabsTrigger value="music" className="gap-2"><Music className="w-4 h-4" /><span className="hidden sm:inline">Músicas</span></TabsTrigger>
-              <TabsTrigger value="ebook" className="gap-2"><BookOpen className="w-4 h-4" /><span className="hidden sm:inline">E-book</span></TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1">
+              <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs">
+                <Baby className="w-4 h-4" />
+                <span>Guias</span>
+              </TabsTrigger>
+              <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs">
+                <Heart className="w-4 h-4" />
+                <span>Sons</span>
+              </TabsTrigger>
+              <TabsTrigger value="sleep" className="flex-col gap-1 py-2 px-1 text-xs">
+                <Moon className="w-4 h-4" />
+                <span>Sono</span>
+              </TabsTrigger>
+              <TabsTrigger value="feeding" className="flex-col gap-1 py-2 px-1 text-xs">
+                <Milk className="w-4 h-4" />
+                <span>Mamar</span>
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="guides" className="space-y-6 mt-6"><PracticalGuides /></TabsContent>
-            <TabsContent value="sounds" className="space-y-6 mt-6"><BabySounds /></TabsContent>
-            <TabsContent value="sleep" className="space-y-6 mt-6"><SleepTracker /></TabsContent>
-            <TabsContent value="feeding" className="space-y-6 mt-6"><FeedingTracker /></TabsContent>
-            <TabsContent value="routine" className="space-y-6 mt-6"><RoutineCalendar /></TabsContent>
-            <TabsContent value="music" className="space-y-6 mt-6"><MusicPlayer /></TabsContent>
-            <TabsContent value="ebook" className="space-y-6 mt-6"><GuideLibrary /></TabsContent>
+            <div className="mt-4">
+              <TabsContent value="guides" className="mt-0"><PracticalGuides /></TabsContent>
+              <TabsContent value="sounds" className="mt-0"><BabySounds /></TabsContent>
+              <TabsContent value="sleep" className="mt-0"><SleepTracker /></TabsContent>
+              <TabsContent value="feeding" className="mt-0"><FeedingTracker /></TabsContent>
+            </div>
+
+            {/* Secondary Tabs - Collapsible */}
+            <div className="mt-4 p-3 rounded-lg bg-card border">
+              <details className="group">
+                <summary className="cursor-pointer list-none flex items-center justify-between font-semibold text-sm">
+                  <span>📚 Mais Recursos</span>
+                  <span className="transition group-open:rotate-180">▼</span>
+                </summary>
+                <div className="mt-3 space-y-2">
+                  <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1">
+                    <TabsTrigger value="routine" className="flex-col gap-1 py-2 text-xs">
+                      <Calendar className="w-4 h-4" />
+                      <span>Rotina</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="music" className="flex-col gap-1 py-2 text-xs">
+                      <Music className="w-4 h-4" />
+                      <span>Músicas</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="ebook" className="flex-col gap-1 py-2 text-xs">
+                      <BookOpen className="w-4 h-4" />
+                      <span>E-book</span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="routine" className="mt-2"><RoutineCalendar /></TabsContent>
+                  <TabsContent value="music" className="mt-2"><MusicPlayer /></TabsContent>
+                  <TabsContent value="ebook" className="mt-2"><GuideLibrary /></TabsContent>
+                </div>
+              </details>
+            </div>
           </Tabs>
 
           {/* Footer */}
-          <div className="text-center space-y-2 pt-8 pb-4 border-t">
-            <p className="text-sm text-muted-foreground">💝 Feito com amor para todas as mamães incríveis</p>
-            <p className="text-xs text-muted-foreground">App Premium Mamãe Zen • Todos os direitos reservados</p>
+          <div className="text-center space-y-1 pt-6 pb-4 border-t">
+            <p className="text-xs text-muted-foreground">💝 Feito com amor para mamães</p>
+            <p className="text-[10px] text-muted-foreground">Mamãe Zen Premium</p>
           </div>
         </div>
       </div>

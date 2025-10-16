@@ -52,45 +52,47 @@ const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetin
 
   return (
     <Card 
-      className="relative overflow-hidden border-0 shadow-[var(--shadow-soft)]"
+      className="relative overflow-hidden border-0 shadow-lg"
       style={{ background: greeting.gradient }}
     >
-      <div className="relative z-10 p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <GreetingIcon className="w-8 h-8 text-white drop-shadow-lg" />
-          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-            {greeting.text}
-          </h1>
-          <Sparkles className="w-6 h-6 text-white/80 animate-pulse" />
+      <div className="relative z-10 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <GreetingIcon className="w-6 h-6 text-white drop-shadow-lg" />
+            <h1 className="text-lg font-bold text-white drop-shadow-lg">
+              {greeting.text}
+            </h1>
+          </div>
+          <Sparkles className="w-5 h-5 text-white/80 animate-pulse" />
         </div>
         
-        <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-6 border border-white/40">
-          <p className="text-white font-medium mb-4 text-lg">
-            Como você está se sentindo agora, minha linda?
+        <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/40">
+          <p className="text-white text-xs font-medium mb-2">
+            Como está se sentindo?
           </p>
           
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-5 gap-1.5">
             {moods.map((mood) => (
               <button
                 key={mood.value}
                 onClick={() => onMoodSelect?.(mood.value)}
-                className="flex flex-col items-center gap-2 px-6 py-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-white/50"
+                className="flex flex-col items-center gap-1 p-2 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-lg transition-all active:scale-95 border border-white/50"
               >
-                <span className="text-3xl">{mood.emoji}</span>
-                <span className="text-sm font-medium text-foreground">{mood.label}</span>
+                <span className="text-xl">{mood.emoji}</span>
+                <span className="text-[10px] font-medium text-foreground leading-tight">{mood.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <p className="text-white/90 text-sm mt-4 text-center font-medium">
+        <p className="text-white/90 text-xs mt-2 text-center font-medium">
           {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
       
       {/* Decorative elements */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/20 rounded-full blur-3xl"></div>
+      <div className="absolute -top-10 -right-10 w-20 h-20 bg-white/20 rounded-full blur-2xl"></div>
+      <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-white/20 rounded-full blur-2xl"></div>
     </Card>
   );
 };
