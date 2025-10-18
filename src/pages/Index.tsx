@@ -7,8 +7,11 @@ import PracticalGuides from '@/components/PracticalGuides';
 import BabySounds from '@/components/BabySounds';
 import SleepTracker from '@/components/SleepTracker';
 import FeedingTracker from '@/components/FeedingTracker';
+import MedicineGuide from '@/components/MedicineGuide';
+import AutismGuide from '@/components/AutismGuide';
+import EmergencyMap from '@/components/EmergencyMap';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart } from 'lucide-react';
+import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -120,32 +123,44 @@ const Index = () => {
                 <Heart className="w-4 h-4" />
                 <span>Sons</span>
               </TabsTrigger>
-              <TabsTrigger value="sleep" className="flex-col gap-1 py-2 px-1 text-xs">
-                <Moon className="w-4 h-4" />
-                <span>Sono</span>
+              <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs">
+                <Pill className="w-4 h-4" />
+                <span>Remédios</span>
               </TabsTrigger>
-              <TabsTrigger value="feeding" className="flex-col gap-1 py-2 px-1 text-xs">
-                <Milk className="w-4 h-4" />
-                <span>Mamar</span>
+              <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs">
+                <MapPin className="w-4 h-4" />
+                <span>Emergência</span>
               </TabsTrigger>
             </TabsList>
 
             <div className="mt-4">
               <TabsContent value="guides" className="mt-0"><PracticalGuides /></TabsContent>
               <TabsContent value="sounds" className="mt-0"><BabySounds /></TabsContent>
-              <TabsContent value="sleep" className="mt-0"><SleepTracker /></TabsContent>
-              <TabsContent value="feeding" className="mt-0"><FeedingTracker /></TabsContent>
+              <TabsContent value="medicine" className="mt-0"><MedicineGuide /></TabsContent>
+              <TabsContent value="emergency" className="mt-0"><EmergencyMap /></TabsContent>
             </div>
 
             {/* Secondary Tabs - Collapsible */}
-            <div className="mt-4 p-3 rounded-lg bg-card border">
+            <div className="mt-4 p-3 rounded-lg bg-card border border-primary/20 shadow-md">
               <details className="group">
                 <summary className="cursor-pointer list-none flex items-center justify-between font-semibold text-sm">
-                  <span>📚 Mais Recursos</span>
+                  <span>✨ Mais Recursos Premium</span>
                   <span className="transition group-open:rotate-180">▼</span>
                 </summary>
                 <div className="mt-3 space-y-2">
-                  <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1">
+                  <TabsList className="grid w-full grid-cols-2 gap-1 h-auto p-1">
+                    <TabsTrigger value="sleep" className="flex-col gap-1 py-2 text-xs">
+                      <Moon className="w-4 h-4" />
+                      <span>Sono</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="feeding" className="flex-col gap-1 py-2 text-xs">
+                      <Milk className="w-4 h-4" />
+                      <span>Mamar</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="autism" className="flex-col gap-1 py-2 text-xs">
+                      <Brain className="w-4 h-4" />
+                      <span>Autismo</span>
+                    </TabsTrigger>
                     <TabsTrigger value="routine" className="flex-col gap-1 py-2 text-xs">
                       <Calendar className="w-4 h-4" />
                       <span>Rotina</span>
@@ -159,6 +174,9 @@ const Index = () => {
                       <span>E-book</span>
                     </TabsTrigger>
                   </TabsList>
+                  <TabsContent value="sleep" className="mt-2"><SleepTracker /></TabsContent>
+                  <TabsContent value="feeding" className="mt-2"><FeedingTracker /></TabsContent>
+                  <TabsContent value="autism" className="mt-2"><AutismGuide /></TabsContent>
                   <TabsContent value="routine" className="mt-2"><RoutineCalendar /></TabsContent>
                   <TabsContent value="music" className="mt-2"><MusicPlayer /></TabsContent>
                   <TabsContent value="ebook" className="mt-2"><GuideLibrary /></TabsContent>
