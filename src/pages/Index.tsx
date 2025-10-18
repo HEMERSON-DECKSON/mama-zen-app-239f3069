@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import WelcomeGreeting from '@/components/WelcomeGreeting';
+import { Button } from '@/components/ui/button';
 import MusicPlayer from '@/components/MusicPlayer';
 import RoutineCalendar from '@/components/RoutineCalendar';
 import GuideLibrary from '@/components/GuideLibrary';
@@ -15,7 +17,6 @@ import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Bra
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -186,9 +187,28 @@ const Index = () => {
           </Tabs>
 
           {/* Footer */}
-          <div className="text-center space-y-1 pt-6 pb-4 border-t">
+          <div className="text-center space-y-2 pt-6 pb-4 border-t">
             <p className="text-xs text-muted-foreground">💝 Feito com amor para mamães</p>
-            <p className="text-[10px] text-muted-foreground">Mamãe Zen Premium</p>
+            <p className="text-xs font-semibold">© {new Date().getFullYear()} Mamãe Zen Premium</p>
+            <p className="text-[10px] text-muted-foreground">
+              Todos os direitos reservados a <span className="text-primary font-semibold">Hemerson Deckson</span>
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              Desenvolvido com 💝 por <span className="text-primary font-semibold">Hemerson Deckson</span> com{" "}
+              <a 
+                href="https://lovable.dev" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-semibold"
+              >
+                Lovable.dev
+              </a>
+            </p>
+            <Link to="/privacy">
+              <Button variant="link" size="sm" className="text-[10px] h-auto p-0">
+                Política de Privacidade
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
