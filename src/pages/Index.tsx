@@ -12,6 +12,7 @@ import FeedingTracker from '@/components/FeedingTracker';
 import MedicineGuide from '@/components/MedicineGuide';
 import AutismGuide from '@/components/AutismGuide';
 import EmergencyMap from '@/components/EmergencyMap';
+import AntiInspect from '@/components/AntiInspect';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
@@ -58,6 +59,7 @@ const Index = () => {
 
   return (
     <>
+      <AntiInspect />
       <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Navigation, Hospital, Stethoscope, Loader2 } from "lucide-react";
+import { MapPin, Phone, Navigation, Hospital, Stethoscope, Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+
+interface IPLocationData {
+  city: string;
+  region: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
 
 interface Location {
   lat: number;
@@ -12,70 +20,20 @@ interface Location {
 
 interface Emergency {
   name: string;
-  type: "hospital" | "clinica" | "pronto-socorro";
+  type: "hospital" | "clinica" | "pronto-socorro" | "publico" | "particular";
   phone: string;
   address: string;
   distance?: number;
   lat?: number;
   lng?: number;
+  isPublic?: boolean;
 }
 
 const EmergencyMap = () => {
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(false);
   const [nearbyPlaces, setNearbyPlaces] = useState<Emergency[]>([]);
-
-  // Dados de exemplo - em produção, usar API do Google Places ou similar
-  const emergencyPlaces: Emergency[] = [
-    {
-      name: "Hospital e Maternidade São Luiz",
-      type: "hospital",
-      phone: "(11) 3040-6000",
-      address: "R. Dr. Alceu de Campos Rodrigues, 229 - Vila Nova Conceição",
-      lat: -23.5965,
-      lng: -46.6740
-    },
-    {
-      name: "Hospital Infantil Sabará",
-      type: "hospital",
-      phone: "(11) 3155-0200",
-      address: "Av. Angélica, 1968 - Consolação",
-      lat: -23.5494,
-      lng: -46.6600
-    },
-    {
-      name: "Hospital Albert Einstein",
-      type: "hospital",
-      phone: "(11) 2151-1233",
-      address: "Av. Albert Einstein, 627 - Morumbi",
-      lat: -23.5986,
-      lng: -46.7158
-    },
-    {
-      name: "Pronto-Socorro Infantil 24h",
-      type: "pronto-socorro",
-      phone: "(11) 3069-6000",
-      address: "R. Vergueiro, 1421 - Paraíso",
-      lat: -23.5732,
-      lng: -46.6414
-    },
-    {
-      name: "Clínica Pediátrica Crescer",
-      type: "clinica",
-      phone: "(11) 3885-9900",
-      address: "Av. Paulista, 1765 - Bela Vista",
-      lat: -23.5613,
-      lng: -46.6563
-    },
-    {
-      name: "Hospital da Criança e Maternidade",
-      type: "hospital",
-      phone: "(11) 2069-8800",
-      address: "R. dos Otonis, 700 - Vila Clementino",
-      lat: -23.5933,
-      lng: -46.6411
-    }
-  ];
+  const [ipLocation, setIpLocation] = useState<IPLocationData | null>(null);
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371; // Raio da Terra em km
@@ -89,50 +47,127 @@ const EmergencyMap = () => {
     return R * c;
   };
 
-  const getLocation = () => {
-    setLoading(true);
-    
-    if (!navigator.geolocation) {
-      toast.error("Geolocalização não é suportada pelo seu navegador");
-      setLoading(false);
-      return;
+  const getIPLocation = async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      return {
+        city: data.city,
+        region: data.region,
+        country: data.country_name,
+        latitude: data.latitude,
+        longitude: data.longitude
+      };
+    } catch (error) {
+      console.error("Erro ao obter localização por IP:", error);
+      return null;
     }
+  };
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
+  const searchNearbyHospitals = async (lat: number, lng: number, city: string, region: string) => {
+    try {
+      // Usando Overpass API (OpenStreetMap) para buscar hospitais - GRATUITO!
+      const radius = 10000; // 10km de raio
+      const query = `
+        [out:json][timeout:25];
+        (
+          node["amenity"="hospital"](around:${radius},${lat},${lng});
+          way["amenity"="hospital"](around:${radius},${lat},${lng});
+          node["amenity"="clinic"](around:${radius},${lat},${lng});
+          way["amenity"="clinic"](around:${radius},${lat},${lng});
+          node["healthcare"="hospital"](around:${radius},${lat},${lng});
+          way["healthcare"="hospital"](around:${radius},${lat},${lng});
+        );
+        out center;
+      `;
+      
+      const response = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: query
+      });
+      
+      const data = await response.json();
+      
+      const hospitals: Emergency[] = data.elements.map((element: any) => {
+        const elementLat = element.lat || element.center?.lat;
+        const elementLng = element.lon || element.center?.lon;
+        const distance = calculateDistance(lat, lng, elementLat, elementLng);
+        
+        return {
+          name: element.tags?.name || "Hospital sem nome",
+          type: element.tags?.amenity === "clinic" ? "clinica" : "hospital" as any,
+          phone: element.tags?.phone || element.tags?.["contact:phone"] || "Não disponível",
+          address: `${element.tags?.["addr:street"] || ""} ${element.tags?.["addr:housenumber"] || ""}, ${city} - ${region}`.trim(),
+          lat: elementLat,
+          lng: elementLng,
+          distance,
+          isPublic: element.tags?.["healthcare:funding"] === "public" || 
+                   element.tags?.operator?.toLowerCase().includes("sus") ||
+                   element.tags?.operator?.toLowerCase().includes("público")
         };
-        setUserLocation(location);
-        
-        // Calcular distâncias
-        const placesWithDistance = emergencyPlaces.map(place => ({
-          ...place,
-          distance: calculateDistance(
-            location.lat,
-            location.lng,
-            place.lat || 0,
-            place.lng || 0
-          )
-        })).sort((a, b) => (a.distance || 0) - (b.distance || 0));
-        
-        setNearbyPlaces(placesWithDistance);
+      }).filter((h: Emergency) => h.name !== "Hospital sem nome");
+
+      return hospitals.sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 10);
+    } catch (error) {
+      console.error("Erro ao buscar hospitais:", error);
+      toast.error("Erro ao buscar hospitais próximos");
+      return [];
+    }
+  };
+
+  const getLocation = async () => {
+    setLoading(true);
+    toast.info("🔍 Buscando hospitais da sua região...");
+    
+    try {
+      // Primeiro, obter localização por IP
+      const ipData = await getIPLocation();
+      
+      if (!ipData) {
+        toast.error("Não foi possível obter sua localização por IP");
         setLoading(false);
-        toast.success("📍 Localização obtida! Mostrando lugares mais próximos");
-      },
-      (error) => {
-        console.error("Erro ao obter localização:", error);
-        toast.error("Não foi possível obter sua localização. Mostrando todos os lugares.");
-        setNearbyPlaces(emergencyPlaces);
-        setLoading(false);
+        return;
       }
-    );
+      
+      setIpLocation(ipData);
+      
+      const location = {
+        lat: ipData.latitude,
+        lng: ipData.longitude
+      };
+      setUserLocation(location);
+      
+      // Buscar hospitais próximos baseado na localização do IP
+      toast.info(`📍 Localização: ${ipData.city} - ${ipData.region}`);
+      const hospitals = await searchNearbyHospitals(
+        ipData.latitude, 
+        ipData.longitude,
+        ipData.city,
+        ipData.region
+      );
+      
+      if (hospitals.length > 0) {
+        setNearbyPlaces(hospitals);
+        toast.success(`✅ Encontrados ${hospitals.length} hospitais/clínicas em ${ipData.city}!`);
+      } else {
+        toast.warning("Nenhum hospital encontrado próximo. Tente novamente.");
+      }
+      
+    } catch (error) {
+      console.error("Erro:", error);
+      toast.error("Erro ao buscar hospitais. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Carregar lugares ao montar o componente
-    setNearbyPlaces(emergencyPlaces);
+    // Buscar localização automaticamente ao carregar
+    getIPLocation().then(data => {
+      if (data) {
+        setIpLocation(data);
+      }
+    });
   }, []);
 
   const openInMaps = (place: Emergency) => {
@@ -156,15 +191,28 @@ const EmergencyMap = () => {
     }
   };
 
-  const getTypeBadge = (type: string) => {
-    switch (type) {
-      case "hospital":
-        return <Badge className="text-[10px] px-1.5 py-0 bg-red-500">Hospital</Badge>;
-      case "pronto-socorro":
-        return <Badge className="text-[10px] px-1.5 py-0 bg-orange-500">Pronto-Socorro</Badge>;
-      default:
-        return <Badge className="text-[10px] px-1.5 py-0 bg-blue-500">Clínica</Badge>;
+  const getTypeBadge = (place: Emergency) => {
+    const badges = [];
+    
+    // Badge de tipo
+    if (place.type === "hospital") {
+      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-red-500">Hospital</Badge>);
+    } else if (place.type === "pronto-socorro") {
+      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-orange-500">Pronto-Socorro</Badge>);
+    } else {
+      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-blue-500">Clínica</Badge>);
     }
+    
+    // Badge de público/particular
+    if (place.isPublic !== undefined) {
+      badges.push(
+        <Badge key="funding" variant="outline" className="text-[10px] px-1.5 py-0">
+          {place.isPublic ? "🏥 Público" : "💼 Particular"}
+        </Badge>
+      );
+    }
+    
+    return badges;
   };
 
   return (
@@ -176,7 +224,11 @@ const EmergencyMap = () => {
             <CardTitle className="text-lg text-red-700 dark:text-red-400">Emergências</CardTitle>
           </div>
           <CardDescription className="text-xs leading-relaxed">
-            🚨 Encontre hospitais e atendimentos pediátricos próximos a você
+            {ipLocation ? (
+              <>📍 Sua região: <strong>{ipLocation.city} - {ipLocation.region}</strong></>
+            ) : (
+              <>🚨 Encontre hospitais e atendimentos pediátricos próximos a você</>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-3 pt-0">
@@ -244,9 +296,15 @@ const EmergencyMap = () => {
 
       {/* Lista de Hospitais e Clínicas */}
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold px-1">
-          {userLocation ? "📍 Mais próximos de você:" : "🏥 Hospitais e Clínicas Pediátricas:"}
-        </h3>
+        {nearbyPlaces.length > 0 && (
+          <h3 className="text-sm font-semibold px-1">
+            {userLocation && ipLocation ? (
+              <>📍 Hospitais em {ipLocation.city} - {ipLocation.region}:</>
+            ) : (
+              <>🏥 Clique no botão acima para buscar hospitais da sua região</>
+            )}
+          </h3>
+        )}
         {nearbyPlaces.map((place, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow">
             <CardContent className="p-3">
@@ -258,7 +316,7 @@ const EmergencyMap = () => {
                       <h4 className="font-semibold text-sm leading-tight">{place.name}</h4>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      {getTypeBadge(place.type)}
+                      {getTypeBadge(place)}
                       {place.distance && (
                         <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                           📏 {place.distance.toFixed(1)} km
