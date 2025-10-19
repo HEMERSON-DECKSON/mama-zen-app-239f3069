@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useCountry } from '@/contexts/CountryContext';
 import WelcomeGreeting from '@/components/WelcomeGreeting';
+import CountrySelector from '@/components/CountrySelector';
 import { Button } from '@/components/ui/button';
 import MusicPlayer from '@/components/MusicPlayer';
 import RoutineCalendar from '@/components/RoutineCalendar';
@@ -20,6 +22,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input';
 
 const Index = () => {
+  const { isUSA } = useCountry();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('');
   const [tempName, setTempName] = useState<string>('');
@@ -39,14 +42,17 @@ const Index = () => {
       setUserName(tempName.trim());
       localStorage.setItem('userName', tempName.trim());
       setShowNameDialog(false);
-      toast.success(`Bem-vinda, ${tempName.trim()}! Sua jornada premium começa agora! 💝✨`);
+      const message = isUSA 
+        ? `Welcome, ${tempName.trim()}! Your premium journey starts now! 💝✨`
+        : `Bem-vinda, ${tempName.trim()}! Sua jornada premium começa agora! 💝✨`;
+      toast.success(message);
     }
   };
 
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood);
     
-    const moodMessages: Record<string, string> = {
+    const moodMessagesBR: Record<string, string> = {
       good: 'Que ótimo! Continue assim, você está incrível! 💪',
       calm: 'Maravilhoso estar tranquila. Aproveite esse momento de paz. 🧘‍♀️',
       tired: 'Eu entendo, minha linda. Lembre-se de descansar sempre que possível. 💤',
@@ -54,7 +60,17 @@ const Index = () => {
       happy: 'Que alegria! Sua felicidade ilumina tudo ao redor! ✨',
     };
 
-    toast.success(moodMessages[mood] || 'Obrigada por compartilhar!');
+    const moodMessagesUSA: Record<string, string> = {
+      good: 'That\'s great! Keep it up, you\'re amazing! 💪',
+      calm: 'Wonderful to feel calm. Enjoy this moment of peace. 🧘‍♀️',
+      tired: 'I understand, dear. Remember to rest whenever possible. 💤',
+      anxious: 'Take a deep breath. You\'re doing an incredible job. Everything will be okay. 🌸',
+      happy: 'How joyful! Your happiness brightens everything around! ✨',
+    };
+
+    const messages = isUSA ? moodMessagesUSA : moodMessagesBR;
+    const defaultMsg = isUSA ? 'Thanks for sharing!' : 'Obrigada por compartilhar!';
+    toast.success(messages[mood] || defaultMsg);
   };
 
   return (
@@ -63,14 +79,18 @@ const Index = () => {
       <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-2xl text-center">Bem-vinda, Mamãe! 💝</DialogTitle>
+            <DialogTitle className="text-2xl text-center">
+              {isUSA ? 'Welcome, Mom! 💝' : 'Bem-vinda, Mamãe! 💝'}
+            </DialogTitle>
             <DialogDescription className="text-center text-base pt-2">
-              Informe o seu nome para que eu possa criar uma experiência especial para você
+              {isUSA 
+                ? 'Enter your name so I can create a special experience for you'
+                : 'Informe o seu nome para que eu possa criar uma experiência especial para você'}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
             <Input
-              placeholder="Digite seu nome..."
+              placeholder={isUSA ? "Enter your name..." : "Digite seu nome..."}
               value={tempName}
               onChange={(e) => setTempName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleNameSubmit()}
@@ -83,7 +103,7 @@ const Index = () => {
               className="w-full"
               size="lg"
             >
-              Começar minha jornada 🌟
+              {isUSA ? 'Start my journey 🌟' : 'Começar minha jornada 🌟'}
             </Button>
           </div>
         </DialogContent>
@@ -96,16 +116,21 @@ const Index = () => {
             <div className="flex items-center justify-center gap-2 mb-1">
               <Sparkles className="w-6 h-6 text-pink-500 animate-pulse" />
               <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Mamãe Zen
+                {isUSA ? 'Mom Zen' : 'Mamãe Zen'}
               </h1>
               <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
             </div>
             <p className="text-muted-foreground text-sm font-medium px-4">
-              ✨ App premium de maternidade ✨
+              {isUSA ? '✨ Premium motherhood app ✨' : '✨ App premium de maternidade ✨'}
             </p>
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs">PREMIUM</span>
             </div>
+          </div>
+
+          {/* Country Selector */}
+          <div className="animate-fade-in">
+            <CountrySelector />
           </div>
 
           {/* Welcome */}
@@ -120,19 +145,19 @@ const Index = () => {
             <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1">
               <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs">
                 <Baby className="w-4 h-4" />
-                <span>Guias</span>
+                <span>{isUSA ? 'Guides' : 'Guias'}</span>
               </TabsTrigger>
               <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs">
                 <Heart className="w-4 h-4" />
-                <span>Sons</span>
+                <span>{isUSA ? 'Sounds' : 'Sons'}</span>
               </TabsTrigger>
               <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs">
                 <Pill className="w-4 h-4" />
-                <span>Remédios</span>
+                <span>{isUSA ? 'Medicine' : 'Remédios'}</span>
               </TabsTrigger>
               <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs">
                 <MapPin className="w-4 h-4" />
-                <span>Emergência</span>
+                <span>{isUSA ? 'Emergency' : 'Emergência'}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -147,34 +172,34 @@ const Index = () => {
             <div className="mt-4 p-3 rounded-lg bg-card border border-primary/20 shadow-md">
               <details className="group">
                 <summary className="cursor-pointer list-none flex items-center justify-between font-semibold text-sm">
-                  <span>✨ Mais Recursos Premium</span>
+                  <span>{isUSA ? '✨ More Premium Features' : '✨ Mais Recursos Premium'}</span>
                   <span className="transition group-open:rotate-180">▼</span>
                 </summary>
                 <div className="mt-3 space-y-2">
                   <TabsList className="grid w-full grid-cols-2 gap-1 h-auto p-1">
                     <TabsTrigger value="sleep" className="flex-col gap-1 py-2 text-xs">
                       <Moon className="w-4 h-4" />
-                      <span>Sono</span>
+                      <span>{isUSA ? 'Sleep' : 'Sono'}</span>
                     </TabsTrigger>
                     <TabsTrigger value="feeding" className="flex-col gap-1 py-2 text-xs">
                       <Milk className="w-4 h-4" />
-                      <span>Mamar</span>
+                      <span>{isUSA ? 'Feed' : 'Mamar'}</span>
                     </TabsTrigger>
                     <TabsTrigger value="autism" className="flex-col gap-1 py-2 text-xs">
                       <Brain className="w-4 h-4" />
-                      <span>Autismo</span>
+                      <span>{isUSA ? 'Autism' : 'Autismo'}</span>
                     </TabsTrigger>
                     <TabsTrigger value="routine" className="flex-col gap-1 py-2 text-xs">
                       <Calendar className="w-4 h-4" />
-                      <span>Rotina</span>
+                      <span>{isUSA ? 'Routine' : 'Rotina'}</span>
                     </TabsTrigger>
                     <TabsTrigger value="music" className="flex-col gap-1 py-2 text-xs">
                       <Music className="w-4 h-4" />
-                      <span>Músicas</span>
+                      <span>{isUSA ? 'Music' : 'Músicas'}</span>
                     </TabsTrigger>
                     <TabsTrigger value="ebook" className="flex-col gap-1 py-2 text-xs">
                       <BookOpen className="w-4 h-4" />
-                      <span>E-book</span>
+                      <span>{isUSA ? 'E-book' : 'E-book'}</span>
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="sleep" className="mt-2"><SleepTracker /></TabsContent>
@@ -190,13 +215,20 @@ const Index = () => {
 
           {/* Footer */}
           <div className="text-center space-y-2 pt-6 pb-4 border-t">
-            <p className="text-xs text-muted-foreground">💝 Feito com amor para mamães</p>
-            <p className="text-xs font-semibold">© {new Date().getFullYear()} Mamãe Zen Premium</p>
-            <p className="text-[10px] text-muted-foreground">
-              Todos os direitos reservados a <span className="text-primary font-semibold">Hemerson Deckson</span>
+            <p className="text-xs text-muted-foreground">
+              {isUSA ? '💝 Made with love for moms' : '💝 Feito com amor para mamães'}
+            </p>
+            <p className="text-xs font-semibold">
+              © {new Date().getFullYear()} {isUSA ? 'Mom Zen Premium' : 'Mamãe Zen Premium'}
             </p>
             <p className="text-[10px] text-muted-foreground">
-              Desenvolvido com 💝 por <span className="text-primary font-semibold">Hemerson Deckson</span> com{" "}
+              {isUSA ? 'All rights reserved to' : 'Todos os direitos reservados a'}{' '}
+              <span className="text-primary font-semibold">Hemerson Deckson</span>
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              {isUSA ? 'Developed with 💝 by' : 'Desenvolvido com 💝 por'}{' '}
+              <span className="text-primary font-semibold">Hemerson Deckson</span>{' '}
+              {isUSA ? 'with' : 'com'}{" "}
               <a 
                 href="https://lovable.dev" 
                 target="_blank" 
@@ -208,7 +240,7 @@ const Index = () => {
             </p>
             <Link to="/privacy">
               <Button variant="link" size="sm" className="text-[10px] h-auto p-0">
-                Política de Privacidade
+                {isUSA ? 'Privacy Policy' : 'Política de Privacidade'}
               </Button>
             </Link>
           </div>

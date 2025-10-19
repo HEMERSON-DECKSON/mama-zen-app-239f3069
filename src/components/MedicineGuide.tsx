@@ -2,9 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Pill, Baby, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useCountry } from "@/contexts/CountryContext";
+import { medicineDataBR, medicineDataUSA } from "@/data/medicineData";
 
 const MedicineGuide = () => {
-  const babyMedicines = [
+  const { isUSA } = useCountry();
+  const data = isUSA ? medicineDataUSA : medicineDataBR;
+  const { babyMedicines, momMedicines, commonConditions } = data;
+
+  const oldBabyMedicines = [
     {
       name: "Paracetamol (Tylenol Bebê)",
       use: "Febre e dor",
@@ -139,7 +145,7 @@ const MedicineGuide = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Pill className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Guia de Medicamentos</CardTitle>
+            <CardTitle className="text-lg">{isUSA ? 'Medicine Guide' : 'Guia de Medicamentos'}</CardTitle>
           </div>
           <CardDescription className="text-xs">
             ⚠️ ATENÇÃO: Sempre consulte um pediatra antes de administrar qualquer medicamento ao seu bebê

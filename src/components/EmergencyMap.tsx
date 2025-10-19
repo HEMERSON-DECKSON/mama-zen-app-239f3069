@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Navigation, Hospital, Stethoscope, Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useCountry } from "@/contexts/CountryContext";
 
 interface IPLocationData {
   city: string;
@@ -30,6 +31,7 @@ interface Emergency {
 }
 
 const EmergencyMap = () => {
+  const { isUSA } = useCountry();
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(false);
   const [nearbyPlaces, setNearbyPlaces] = useState<Emergency[]>([]);
@@ -258,38 +260,73 @@ const EmergencyMap = () => {
         </CardContent>
       </Card>
 
-      {/* SAMU e Emergências */}
+      {/* Emergency Numbers */}
       <Card className="bg-red-500 dark:bg-red-900 text-white border-2 border-red-600">
         <CardContent className="p-4">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-bold text-sm">🚑 SAMU - Emergência</p>
-                <p className="text-xs opacity-90">Atendimento médico de urgência</p>
-              </div>
-              <Button 
-                onClick={() => callPhone("192")} 
-                size="sm"
-                className="bg-white text-red-600 hover:bg-red-50"
-              >
-                <Phone className="w-4 h-4" />
-                192
-              </Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-bold text-sm">🚨 Bombeiros</p>
-                <p className="text-xs opacity-90">Emergências e resgates</p>
-              </div>
-              <Button 
-                onClick={() => callPhone("193")} 
-                size="sm"
-                className="bg-white text-red-600 hover:bg-red-50"
-              >
-                <Phone className="w-4 h-4" />
-                193
-              </Button>
-            </div>
+            {isUSA ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-sm">🚑 Emergency Services</p>
+                    <p className="text-xs opacity-90">Police, Fire, Medical</p>
+                  </div>
+                  <Button 
+                    onClick={() => callPhone("911")} 
+                    size="sm"
+                    className="bg-white text-red-600 hover:bg-red-50"
+                  >
+                    <Phone className="w-4 h-4" />
+                    911
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-sm">☎️ Poison Control</p>
+                    <p className="text-xs opacity-90">Poisoning emergencies</p>
+                  </div>
+                  <Button 
+                    onClick={() => callPhone("1-800-222-1222")} 
+                    size="sm"
+                    className="bg-white text-red-600 hover:bg-red-50 text-[10px]"
+                  >
+                    <Phone className="w-3 h-3" />
+                    Call
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-sm">🚑 SAMU - Emergência</p>
+                    <p className="text-xs opacity-90">Atendimento médico de urgência</p>
+                  </div>
+                  <Button 
+                    onClick={() => callPhone("192")} 
+                    size="sm"
+                    className="bg-white text-red-600 hover:bg-red-50"
+                  >
+                    <Phone className="w-4 h-4" />
+                    192
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-sm">🚨 Bombeiros</p>
+                    <p className="text-xs opacity-90">Emergências e resgates</p>
+                  </div>
+                  <Button 
+                    onClick={() => callPhone("193")} 
+                    size="sm"
+                    className="bg-white text-red-600 hover:bg-red-50"
+                  >
+                    <Phone className="w-4 h-4" />
+                    193
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

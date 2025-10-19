@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Sparkles, Moon, Sun, Sunset } from 'lucide-react';
+import { useCountry } from '@/contexts/CountryContext';
 
 interface WelcomeGreetingProps {
   userName?: string;
@@ -8,6 +9,7 @@ interface WelcomeGreetingProps {
 }
 
 const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetingProps) => {
+  const { isUSA } = useCountry();
   const [greeting, setGreeting] = useState({ text: '', icon: Sun, gradient: 'var(--gradient-morning)' });
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -21,26 +23,32 @@ const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetin
     
     if (hour >= 5 && hour < 12) {
       setGreeting({
-        text: `Bom dia, ${userName}! 🌸`,
+        text: isUSA ? `Good morning, ${userName}! 🌸` : `Bom dia, ${userName}! 🌸`,
         icon: Sun,
         gradient: 'var(--gradient-morning)'
       });
     } else if (hour >= 12 && hour < 18) {
       setGreeting({
-        text: `Boa tarde, ${userName}! ☀️`,
+        text: isUSA ? `Good afternoon, ${userName}! ☀️` : `Boa tarde, ${userName}! ☀️`,
         icon: Sunset,
         gradient: 'var(--gradient-calm)'
       });
     } else {
       setGreeting({
-        text: `Boa noite, ${userName}! 🌙`,
+        text: isUSA ? `Good evening, ${userName}! 🌙` : `Boa noite, ${userName}! 🌙`,
         icon: Moon,
         gradient: 'var(--gradient-evening)'
       });
     }
-  }, [currentTime, userName]);
+  }, [currentTime, userName, isUSA]);
 
-  const moods = [
+  const moods = isUSA ? [
+    { emoji: '😊', label: 'Good', value: 'good' },
+    { emoji: '😌', label: 'Calm', value: 'calm' },
+    { emoji: '😔', label: 'Tired', value: 'tired' },
+    { emoji: '😰', label: 'Anxious', value: 'anxious' },
+    { emoji: '🤗', label: 'Happy', value: 'happy' },
+  ] : [
     { emoji: '😊', label: 'Bem', value: 'good' },
     { emoji: '😌', label: 'Tranquila', value: 'calm' },
     { emoji: '😔', label: 'Cansada', value: 'tired' },
@@ -68,7 +76,7 @@ const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetin
         
         <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/40">
           <p className="text-white text-xs font-medium mb-2">
-            Como está se sentindo?
+            {isUSA ? 'How are you feeling?' : 'Como está se sentindo?'}
           </p>
           
           <div className="grid grid-cols-5 gap-1.5">
@@ -86,7 +94,7 @@ const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetin
         </div>
 
         <p className="text-white/90 text-xs mt-2 text-center font-medium">
-          {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          {currentTime.toLocaleTimeString(isUSA ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
       
