@@ -4,6 +4,7 @@ import { Slider } from "@/components/ui/slider";
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useCountry } from "@/contexts/CountryContext";
 
 interface Sound {
   id: string;
@@ -13,7 +14,7 @@ interface Sound {
   icon: string;
 }
 
-const babySounds: Sound[] = [
+const babySoundsBR: Sound[] = [
   {
     id: "white-noise",
     name: "Ruído Branco",
@@ -58,7 +59,54 @@ const babySounds: Sound[] = [
   }
 ];
 
+const babySoundsUSA: Sound[] = [
+  {
+    id: "white-noise",
+    name: "White Noise",
+    description: "Continuous sound that soothes baby",
+    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_4dd80e2fd6.mp3",
+    icon: "🌊"
+  },
+  {
+    id: "rain",
+    name: "Gentle Rain",
+    description: "Relaxing sound of falling rain",
+    url: "https://cdn.pixabay.com/audio/2022/03/12/audio_74d0e618db.mp3",
+    icon: "🌧️"
+  },
+  {
+    id: "heartbeat",
+    name: "Heartbeat",
+    description: "Reminds of mother's womb",
+    url: "https://cdn.pixabay.com/audio/2023/10/03/audio_13af88aa3e.mp3",
+    icon: "❤️"
+  },
+  {
+    id: "lullaby",
+    name: "Lullaby",
+    description: "Soft melody for sleeping",
+    url: "https://cdn.pixabay.com/audio/2022/11/22/audio_1e5b3b493c.mp3",
+    icon: "🎵"
+  },
+  {
+    id: "ocean",
+    name: "Ocean Waves",
+    description: "Peaceful ocean sound",
+    url: "https://cdn.pixabay.com/audio/2022/06/07/audio_b994e03c42.mp3",
+    icon: "🌊"
+  },
+  {
+    id: "wind",
+    name: "Gentle Wind",
+    description: "Relaxing breeze",
+    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_2748e0cbd7.mp3",
+    icon: "💨"
+  }
+];
+
 export default function BabySounds() {
+  const { isUSA } = useCountry();
+  const babySounds = isUSA ? babySoundsUSA : babySoundsBR;
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
@@ -75,8 +123,8 @@ export default function BabySounds() {
     const handleEnded = () => setIsPlaying(false);
     const handleError = () => {
       toast({
-        title: "Erro ao carregar som",
-        description: "Não foi possível reproduzir este som.",
+        title: isUSA ? "Error loading sound" : "Erro ao carregar som",
+        description: isUSA ? "Could not play this sound." : "Não foi possível reproduzir este som.",
         variant: "destructive"
       });
       setIsPlaying(false);
@@ -139,10 +187,10 @@ export default function BabySounds() {
     <Card className="border-primary/20 shadow-lg">
       <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          🎵 Sons Calmantes
+          🎵 {isUSA ? 'Calming Sounds' : 'Sons Calmantes'}
         </CardTitle>
         <CardDescription className="text-xs">
-          Para acalmar e fazer o bebê dormir
+          {isUSA ? 'To soothe and help baby sleep' : 'Para acalmar e fazer o bebê dormir'}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
@@ -175,7 +223,7 @@ export default function BabySounds() {
                 <div>
                   <p className="font-semibold text-sm">{currentSound.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {isPlaying ? "Tocando..." : "Pausado"}
+                    {isPlaying ? (isUSA ? "Playing..." : "Tocando...") : (isUSA ? "Paused" : "Pausado")}
                   </p>
                 </div>
               </div>
@@ -219,7 +267,7 @@ export default function BabySounds() {
 
         <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-xs">
-            <strong>💡 Dica:</strong> Sons entre 50-70dB são ideais para acalmar o bebê.
+            <strong>💡 {isUSA ? 'Tip' : 'Dica'}:</strong> {isUSA ? 'Sounds between 50-70dB are ideal for soothing baby.' : 'Sons entre 50-70dB são ideais para acalmar o bebê.'}
           </p>
         </div>
       </CardContent>
