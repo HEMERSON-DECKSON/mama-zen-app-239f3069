@@ -173,9 +173,26 @@ const EmergencyMap = () => {
   }, []);
 
   const openInMaps = (place: Emergency) => {
-    const query = encodeURIComponent(place.address);
-    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
-    window.open(mapsUrl, '_blank');
+    if (!place.lat || !place.lng) {
+      const query = encodeURIComponent(place.address);
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+      window.open(mapsUrl, '_blank');
+      return;
+    }
+
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Tenta abrir no app do Google Maps primeiro
+      window.location.href = `google.navigation:q=${place.lat},${place.lng}&label=${encodeURIComponent(place.name)}`;
+      // Fallback para browser após 1 segundo
+      setTimeout(() => {
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`, '_blank');
+      }, 1000);
+    } else {
+      // Desktop: abre direto no browser com rotas
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`, '_blank');
+    }
   };
 
   const callPhone = (phone: string) => {
