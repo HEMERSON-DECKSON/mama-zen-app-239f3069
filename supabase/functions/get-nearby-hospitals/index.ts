@@ -37,81 +37,90 @@ serve(async (req) => {
 
     console.log(`Searching for hospitals near ${lat}, ${lng}`);
 
-    // Search for hospitals using Google Places API
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=10000&type=hospital&key=${apiKey}&language=pt-BR`;
+    // Use Places API (New) - Text Search
+    const searchUrl = 'https://places.googleapis.com/v1/places:searchText';
     
-    const searchResponse = await fetch(searchUrl);
+    const searchResponse = await fetch(searchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.internationalPhoneNumber,places.nationalPhoneNumber,places.location,places.types'
+      },
+      body: JSON.stringify({
+        textQuery: 'hospital pediatrico',
+        locationBias: {
+          circle: {
+            center: {
+              latitude: lat,
+              longitude: lng
+            },
+            radius: 10000.0
+          }
+        },
+        languageCode: 'pt-BR',
+        maxResultCount: 15
+      })
+    });
+
     const searchData = await searchResponse.json();
 
-    if (searchData.status !== 'OK' && searchData.status !== 'ZERO_RESULTS') {
-      console.error('Places API error:', searchData);
-      throw new Error(`Google Places API error: ${searchData.status}`);
-    }
-
-    if (searchData.status === 'ZERO_RESULTS') {
+    if (!searchData.places || searchData.places.length === 0) {
+      console.log('No hospitals found');
       return new Response(
         JSON.stringify({ hospitals: [] }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Found ${searchData.results.length} hospitals`);
+    console.log(`Found ${searchData.places.length} hospitals`);
 
-    // Get detailed info for each hospital
-    const hospitals: Hospital[] = await Promise.all(
-      searchData.results.slice(0, 15).map(async (place: any) => {
+    // Process each hospital
+    const hospitals: Hospital[] = searchData.places.map((place: any) => {
         try {
-          // Get place details including phone number
-          const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,international_phone_number,geometry,types&key=${apiKey}&language=pt-BR`;
-          
-          const detailsResponse = await fetch(detailsUrl);
-          const detailsData = await detailsResponse.json();
-
-          if (detailsData.status !== 'OK') {
-            console.error(`Details error for ${place.name}:`, detailsData.status);
-            return null;
-          }
-
-          const details = detailsData.result;
+          const details = place;
           
           // Calculate distance
+          const placeLat = details.location.latitude;
+          const placeLng = details.location.longitude;
           const R = 6371; // Earth radius in km
-          const dLat = (details.geometry.location.lat - lat) * Math.PI / 180;
-          const dLon = (details.geometry.location.lng - lng) * Math.PI / 180;
+          const dLat = (placeLat - lat) * Math.PI / 180;
+          const dLon = (placeLng - lng) * Math.PI / 180;
           const a = 
             Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat * Math.PI / 180) * Math.cos(details.geometry.location.lat * Math.PI / 180) *
+            Math.cos(lat * Math.PI / 180) * Math.cos(placeLat * Math.PI / 180) *
             Math.sin(dLon/2) * Math.sin(dLon/2);
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
           const distance = R * c;
 
+          const displayName = details.displayName?.text || 'Hospital';
+          
           // Determine if it's public (based on name patterns)
           const isPublic = 
-            details.name.toLowerCase().includes('sus') ||
-            details.name.toLowerCase().includes('público') ||
-            details.name.toLowerCase().includes('municipal') ||
-            details.name.toLowerCase().includes('estadual') ||
-            details.name.toLowerCase().includes('federal') ||
-            details.name.toLowerCase().includes('upa') ||
-            details.name.toLowerCase().includes('unidade básica');
+            displayName.toLowerCase().includes('sus') ||
+            displayName.toLowerCase().includes('público') ||
+            displayName.toLowerCase().includes('municipal') ||
+            displayName.toLowerCase().includes('estadual') ||
+            displayName.toLowerCase().includes('federal') ||
+            displayName.toLowerCase().includes('upa') ||
+            displayName.toLowerCase().includes('unidade básica');
 
           return {
-            name: details.name,
-            address: details.formatted_address,
-            phone: details.international_phone_number || details.formatted_phone_number || 'Não disponível',
-            lat: details.geometry.location.lat,
-            lng: details.geometry.location.lng,
+            name: displayName,
+            address: details.formattedAddress || 'Endereço não disponível',
+            phone: details.internationalPhoneNumber || details.nationalPhoneNumber || 'Não disponível',
+            lat: placeLat,
+            lng: placeLng,
             distance: Math.round(distance * 10) / 10,
-            type: details.types.includes('hospital') ? 'hospital' : 'clinica',
+            type: details.types?.includes('hospital') ? 'hospital' : 'clinica',
             isPublic,
-            placeId: place.place_id
+            placeId: details.id
           };
         } catch (error) {
-          console.error(`Error fetching details for ${place.name}:`, error);
+          console.error(`Error processing hospital:`, error);
           return null;
         }
-      })
-    );
+      });
 
     // Filter out nulls and sort by distance
     const validHospitals = hospitals

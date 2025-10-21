@@ -39,7 +39,7 @@ const babySoundsBR: Sound[] = [
     id: "lullaby",
     name: "Canção de Ninar",
     description: "Melodia suave para dormir",
-    youtubeId: "lGOofzZOyl8",
+    youtubeId: "sgfMb2WycDo",
     icon: "🎵"
   },
   {
@@ -84,7 +84,7 @@ const babySoundsUSA: Sound[] = [
     id: "lullaby",
     name: "Lullaby",
     description: "Soft melody for sleeping",
-    youtubeId: "lGOofzZOyl8",
+    youtubeId: "sgfMb2WycDo",
     icon: "🎵"
   },
   {
