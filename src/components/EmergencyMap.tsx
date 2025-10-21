@@ -5,6 +5,7 @@ import { MapPin, Phone, Navigation, Hospital, Stethoscope, Loader2, Building2 } 
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useCountry } from "@/contexts/CountryContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IPLocationData {
   city: string;
@@ -66,50 +67,23 @@ const EmergencyMap = () => {
     }
   };
 
-  const searchNearbyHospitals = async (lat: number, lng: number, city: string, region: string) => {
+  const searchNearbyHospitals = async (lat: number, lng: number) => {
     try {
-      // Usando Overpass API (OpenStreetMap) para buscar hospitais - GRATUITO!
-      const radius = 10000; // 10km de raio
-      const query = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="hospital"](around:${radius},${lat},${lng});
-          way["amenity"="hospital"](around:${radius},${lat},${lng});
-          node["amenity"="clinic"](around:${radius},${lat},${lng});
-          way["amenity"="clinic"](around:${radius},${lat},${lng});
-          node["healthcare"="hospital"](around:${radius},${lat},${lng});
-          way["healthcare"="hospital"](around:${radius},${lat},${lng});
-        );
-        out center;
-      `;
-      
-      const response = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: query
+      const { data, error } = await supabase.functions.invoke('get-nearby-hospitals', {
+        body: { lat, lng }
       });
-      
-      const data = await response.json();
-      
-      const hospitals: Emergency[] = data.elements.map((element: any) => {
-        const elementLat = element.lat || element.center?.lat;
-        const elementLng = element.lon || element.center?.lon;
-        const distance = calculateDistance(lat, lng, elementLat, elementLng);
-        
-        return {
-          name: element.tags?.name || "Hospital sem nome",
-          type: element.tags?.amenity === "clinic" ? "clinica" : "hospital" as any,
-          phone: element.tags?.phone || element.tags?.["contact:phone"] || "Não disponível",
-          address: `${element.tags?.["addr:street"] || ""} ${element.tags?.["addr:housenumber"] || ""}, ${city} - ${region}`.trim(),
-          lat: elementLat,
-          lng: elementLng,
-          distance,
-          isPublic: element.tags?.["healthcare:funding"] === "public" || 
-                   element.tags?.operator?.toLowerCase().includes("sus") ||
-                   element.tags?.operator?.toLowerCase().includes("público")
-        };
-      }).filter((h: Emergency) => h.name !== "Hospital sem nome");
 
-      return hospitals.sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 10);
+      if (error) {
+        console.error("Erro ao buscar hospitais:", error);
+        toast.error("Erro ao buscar hospitais próximos");
+        return [];
+      }
+
+      if (!data?.hospitals) {
+        return [];
+      }
+
+      return data.hospitals;
     } catch (error) {
       console.error("Erro ao buscar hospitais:", error);
       toast.error("Erro ao buscar hospitais próximos");
@@ -143,9 +117,7 @@ const EmergencyMap = () => {
       toast.info(`📍 Localização: ${ipData.city} - ${ipData.region}`);
       const hospitals = await searchNearbyHospitals(
         ipData.latitude, 
-        ipData.longitude,
-        ipData.city,
-        ipData.region
+        ipData.longitude
       );
       
       if (hospitals.length > 0) {
