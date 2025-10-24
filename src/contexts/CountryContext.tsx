@@ -17,27 +17,6 @@ export const CountryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return (saved as Country) || 'brazil';
   });
 
-  // Auto-detect country based on IP on first visit
-  useEffect(() => {
-    const hasAutoDetected = localStorage.getItem('hasAutoDetected');
-    const savedCountry = localStorage.getItem('selectedCountry');
-    
-    if (!hasAutoDetected && !savedCountry) {
-      fetch('https://ipapi.co/json/')
-        .then(response => response.json())
-        .then(data => {
-          const detectedCountry = data.country_code === 'US' ? 'usa' : 'brazil';
-          setCountryState(detectedCountry);
-          localStorage.setItem('selectedCountry', detectedCountry);
-          localStorage.setItem('hasAutoDetected', 'true');
-        })
-        .catch(() => {
-          // If IP detection fails, default to Brazil
-          localStorage.setItem('hasAutoDetected', 'true');
-        });
-    }
-  }, []);
-
   const setCountry = (newCountry: Country) => {
     setCountryState(newCountry);
     localStorage.setItem('selectedCountry', newCountry);

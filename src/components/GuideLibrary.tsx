@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronRight, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ChapterDialog from './ChapterDialog';
-import { useCountry } from '@/contexts/CountryContext';
 
 const chapters = [
   { id: 1, title: 'O Começo da Jornada', subtitle: 'Entendendo o Seu Corpo Pós-Parto', emoji: '🌸' },
@@ -24,7 +23,6 @@ const chapters = [
 ];
 
 const GuideLibrary = () => {
-  const { isUSA } = useCountry();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selectedChapter, setSelectedChapter] = useState<typeof chapters[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -45,13 +43,11 @@ const GuideLibrary = () => {
       <div className="p-6">
         <div className="flex items-center gap-3 mb-6">
           <BookOpen className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">{isUSA ? 'Complete Guide' : 'Guia Completo'}</h2>
+          <h2 className="text-2xl font-bold text-foreground">Guia Completo</h2>
         </div>
 
         <p className="text-muted-foreground mb-6 leading-relaxed">
-          {isUSA 
-            ? 'Healthy Postpartum Weight Loss: your complete guide to losing weight after childbirth in a healthy and sustainable way.' 
-            : 'Emagrecimento Pós-Parto Saudável: seu guia completo para emagrecer após o parto de forma saudável e sustentável.'}
+          Emagrecimento Pós-Parto Saudável: seu guia completo para emagrecer após o parto de forma saudável e sustentável.
         </p>
 
         <div className="grid gap-3">
@@ -68,7 +64,7 @@ const GuideLibrary = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
-                      {isUSA ? 'Chapter' : 'Capítulo'} {chapter.id}: {chapter.title}
+                      Capítulo {chapter.id}: {chapter.title}
                     </h3>
                     <Button
                       variant="ghost"
@@ -93,7 +89,7 @@ const GuideLibrary = () => {
                     className="h-8 px-3 text-primary hover:text-primary hover:bg-primary/10 -ml-3"
                     onClick={() => openChapter(chapter)}
                   >
-                    {isUSA ? 'Read chapter' : 'Ler capítulo'}
+                    Ler capítulo
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </div>
@@ -104,9 +100,7 @@ const GuideLibrary = () => {
 
         <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20">
           <p className="text-sm text-center text-muted-foreground">
-            💝 {isUSA 
-              ? 'Remember: this journey is about health, self-love and well-being. You are doing an amazing job!' 
-              : 'Lembre-se: esta jornada é sobre saúde, amor próprio e bem-estar. Você está fazendo um trabalho incrível!'}
+            💝 Lembre-se: esta jornada é sobre saúde, amor próprio e bem-estar. Você está fazendo um trabalho incrível!
           </p>
         </div>
       </div>
