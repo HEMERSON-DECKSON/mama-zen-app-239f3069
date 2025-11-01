@@ -34,11 +34,11 @@ const babySounds: Sound[] = [
   },
   {
     id: "heartbeat",
-    name: "Batimentos Cardíacos",
-    description: "Lembra o útero materno",
-    youtubeId: "tuAle-HTtqE", // 12h Heartbeat for Baby
+    name: "Para você mamãe",
+    description: "Melodia especial para o coração",
+    youtubeId: "R9VhcHe6OpQ",
     icon: "❤️",
-    quality: "12h HD"
+    quality: "Premium HD"
   },
   {
     id: "lullaby",
@@ -141,10 +141,10 @@ export default function BabySounds() {
       <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <Music className="w-5 h-5" />
-          Sons Calmantes Premium
+          Sons Calmantes mamaezen
         </CardTitle>
         <CardDescription className="text-xs">
-          Vídeos 4K do YouTube para acalmar e fazer o bebê dormir
+          Áudios premium em alta qualidade para acalmar e fazer o bebê dormir
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
@@ -225,7 +225,7 @@ export default function BabySounds() {
 
         <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-xs">
-            <strong>✨ Premium:</strong> Vídeos 4K de alta qualidade do YouTube, sem anúncios e sem travamentos. Som contínuo em background.
+            <strong>✨ mamaezen Premium:</strong> Áudios em alta qualidade, reprodução contínua sem interrupções. Perfeito para criar um ambiente tranquilo.
           </p>
         </div>
       </CardContent>
