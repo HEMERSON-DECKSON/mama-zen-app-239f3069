@@ -93,15 +93,7 @@ export default function BabySounds() {
     }
   }, [volume, isPlaying]);
 
-  const handleSoundSelect = (sound: Sound) => {
-    if (!isAPIReady) {
-      toast({
-        title: "⏳ Carregando...",
-        description: "Aguarde o player carregar",
-      });
-      return;
-    }
-
+  const handleSoundSelect = async (sound: Sound) => {
     if (currentSound?.id === sound.id) {
       // Toggle play/pause
       if (isPlaying) {
@@ -112,16 +104,20 @@ export default function BabySounds() {
     } else {
       // Troca de som
       setCurrentSound(sound);
-      initializePlayer({
-        videoId: sound.youtubeId,
-        volume: volume[0],
-        onReady: () => {
-          toast({
-            title: `🎵 ${sound.name}`,
-            description: `${sound.description} - ${sound.quality}`,
-          });
-        },
-      });
+      
+      // Pequeno delay para garantir que o DOM está pronto
+      setTimeout(() => {
+        initializePlayer({
+          videoId: sound.youtubeId,
+          volume: volume[0],
+          onReady: () => {
+            toast({
+              title: `🎵 ${sound.name}`,
+              description: `${sound.description} - ${sound.quality}`,
+            });
+          },
+        });
+      }, 100);
     }
   };
 
