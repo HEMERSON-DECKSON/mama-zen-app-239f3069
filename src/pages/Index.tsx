@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCountry } from '@/contexts/CountryContext';
-import mamaeZenLogo from '@/assets/mamae-zen-logo.png';
 import WelcomeGreeting from '@/components/WelcomeGreeting';
 import CountrySelector from '@/components/CountrySelector';
 import { Button } from '@/components/ui/button';
@@ -113,13 +112,13 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
         <div className="w-full max-w-md mx-auto p-4 space-y-6">
           {/* Header */}
-          <div className="text-center space-y-3 animate-fade-in pt-2">
-            <div className="flex items-center justify-center">
-              <img 
-                src={mamaeZenLogo} 
-                alt="Mamãe Zen" 
-                className="w-64 h-auto rounded-2xl shadow-lg"
-              />
+          <div className="text-center space-y-2 animate-fade-in pt-2">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Sparkles className="w-6 h-6 text-pink-500 animate-pulse" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {isUSA ? 'Mom Zen' : 'Mamãe Zen'}
+              </h1>
+              <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
             </div>
             <p className="text-muted-foreground text-sm font-medium px-4">
               {isUSA ? '✨ Premium motherhood app ✨' : '✨ App premium de maternidade ✨'}
