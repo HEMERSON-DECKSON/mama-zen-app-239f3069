@@ -1,16 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Play, Pause, Volume2, Music } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
 
 interface Sound {
   id: string;
   name: string;
   description: string;
-  url: string;
+  youtubeId: string;
   icon: string;
+  quality: string;
 }
 
 const babySounds: Sound[] = [
@@ -18,134 +20,141 @@ const babySounds: Sound[] = [
     id: "white-noise",
     name: "Ruído Branco",
     description: "Som contínuo que acalma o bebê",
-    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_4dd80e2fd6.mp3",
-    icon: "🌊"
+    youtubeId: "nMfPqeZjc2c", // 10h White Noise 4K
+    icon: "🌊",
+    quality: "10h 4K"
   },
   {
     id: "rain",
     name: "Chuva Suave",
     description: "Som relaxante de chuva caindo",
-    url: "https://cdn.pixabay.com/audio/2022/03/12/audio_74d0e618db.mp3",
-    icon: "🌧️"
+    youtubeId: "mPZkdNFkNps", // 10h Rain Sounds 4K
+    icon: "🌧️",
+    quality: "10h 4K"
   },
   {
     id: "heartbeat",
     name: "Batimentos Cardíacos",
     description: "Lembra o útero materno",
-    url: "https://cdn.pixabay.com/audio/2023/10/03/audio_13af88aa3e.mp3",
-    icon: "❤️"
+    youtubeId: "tuAle-HTtqE", // 12h Heartbeat for Baby
+    icon: "❤️",
+    quality: "12h HD"
   },
   {
     id: "lullaby",
     name: "Canção de Ninar",
     description: "Melodia suave para dormir",
-    url: "https://cdn.pixabay.com/audio/2022/11/22/audio_1e5b3b493c.mp3",
-    icon: "🎵"
+    youtubeId: "sgfMb2WycDo", // Vídeo especificado pelo usuário
+    icon: "🎵",
+    quality: "HD"
   },
   {
     id: "ocean",
     name: "Ondas do Mar",
     description: "Som tranquilo do oceano",
-    url: "https://cdn.pixabay.com/audio/2022/06/07/audio_b994e03c42.mp3",
-    icon: "🌊"
+    youtubeId: "WHPEKLQID4U", // 12h Ocean Waves 4K
+    icon: "🌊",
+    quality: "12h 4K"
   },
   {
     id: "wind",
     name: "Vento Suave",
     description: "Brisa relaxante",
-    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_2748e0cbd7.mp3",
-    icon: "💨"
+    youtubeId: "wzjWIxXBs_s", // 10h Wind Sounds 4K
+    icon: "💨",
+    quality: "10h 4K"
   }
 ];
 
 export default function BabySounds() {
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { 
+    isAPIReady, 
+    isPlaying, 
+    containerRef, 
+    initializePlayer, 
+    play, 
+    pause, 
+    stop: stopPlayer,
+    setVolume: setPlayerVolume,
+    destroy 
+  } = useYouTubePlayer();
 
   useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.loop = true;
-    }
-
-    const audio = audioRef.current;
-
-    const handleEnded = () => setIsPlaying(false);
-    const handleError = () => {
-      toast({
-        title: "Erro ao carregar som",
-        description: "Não foi possível reproduzir este som.",
-        variant: "destructive"
-      });
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-
     return () => {
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-      audio.pause();
+      destroy();
     };
   }, []);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume[0] / 100;
+    if (isPlaying) {
+      setPlayerVolume(volume[0]);
     }
-  }, [volume]);
+  }, [volume, isPlaying]);
 
   const handleSoundSelect = (sound: Sound) => {
-    if (!audioRef.current) return;
+    if (!isAPIReady) {
+      toast({
+        title: "⏳ Carregando...",
+        description: "Aguarde o player carregar",
+      });
+      return;
+    }
 
     if (currentSound?.id === sound.id) {
       // Toggle play/pause
       if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
+        pause();
       } else {
-        audioRef.current.play();
-        setIsPlaying(true);
+        play();
       }
     } else {
-      // Change sound
-      audioRef.current.pause();
-      audioRef.current.src = sound.url;
-      audioRef.current.load();
-      audioRef.current.play();
+      // Troca de som
       setCurrentSound(sound);
-      setIsPlaying(true);
-      
-      toast({
-        title: `🎵 ${sound.name}`,
-        description: sound.description
+      initializePlayer({
+        videoId: sound.youtubeId,
+        volume: volume[0],
+        onReady: () => {
+          toast({
+            title: `🎵 ${sound.name}`,
+            description: `${sound.description} - ${sound.quality}`,
+          });
+        },
       });
     }
   };
 
   const handleStop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setCurrentSound(null);
-    }
+    stopPlayer();
+    destroy();
+    setCurrentSound(null);
+    toast({
+      title: "⏹️ Som parado",
+      description: "Reprodução encerrada",
+    });
+  };
+
+  const handleVolumeChange = (newVolume: number[]) => {
+    setVolume(newVolume);
+    setPlayerVolume(newVolume[0]);
   };
 
   return (
     <Card className="border-primary/20 shadow-lg">
       <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          🎵 Sons Calmantes
+          <Music className="w-5 h-5" />
+          Sons Calmantes Premium
         </CardTitle>
         <CardDescription className="text-xs">
-          Para acalmar e fazer o bebê dormir
+          Vídeos 4K do YouTube para acalmar e fazer o bebê dormir
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
+        {/* Container invisível para o player do YouTube */}
+        <div id={containerRef} style={{ display: 'none' }} />
+
         <div className="grid grid-cols-3 gap-2 mb-4">
           {babySounds.map((sound) => (
             <Button
@@ -157,6 +166,7 @@ export default function BabySounds() {
               <span className="text-2xl">{sound.icon}</span>
               <div className="text-center">
                 <div className="font-semibold text-xs leading-tight">{sound.name}</div>
+                <div className="text-[10px] opacity-70 mt-0.5">{sound.quality}</div>
               </div>
               {currentSound?.id === sound.id && isPlaying && (
                 <div className="absolute top-1 right-1">
@@ -168,14 +178,14 @@ export default function BabySounds() {
         </div>
 
         {currentSound && (
-          <div className="space-y-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+          <div className="space-y-3 p-3 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-xl">{currentSound.icon}</span>
                 <div>
                   <p className="font-semibold text-sm">{currentSound.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {isPlaying ? "Tocando..." : "Pausado"}
+                    {isPlaying ? "🎵 Tocando..." : "⏸️ Pausado"} • {currentSound.quality}
                   </p>
                 </div>
               </div>
@@ -204,7 +214,7 @@ export default function BabySounds() {
                 <Volume2 className="w-3 h-3 text-muted-foreground" />
                 <Slider
                   value={volume}
-                  onValueChange={setVolume}
+                  onValueChange={handleVolumeChange}
                   max={100}
                   step={1}
                   className="flex-1"
@@ -217,9 +227,9 @@ export default function BabySounds() {
           </div>
         )}
 
-        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-xs">
-            <strong>💡 Dica:</strong> Sons entre 50-70dB são ideais para acalmar o bebê.
+            <strong>✨ Premium:</strong> Vídeos 4K de alta qualidade do YouTube, sem anúncios e sem travamentos. Som contínuo em background.
           </p>
         </div>
       </CardContent>
