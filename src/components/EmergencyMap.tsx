@@ -240,13 +240,13 @@ const EmergencyMap = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Hospital className="w-5 h-5 text-red-600 dark:text-red-400" />
-            <CardTitle className="text-lg text-red-700 dark:text-red-400">Emergências</CardTitle>
+            <CardTitle className="text-lg text-red-700 dark:text-red-400">Localize os postos emergenciais mais próximos</CardTitle>
           </div>
           <CardDescription className="text-xs leading-relaxed">
             {ipLocation ? (
               <>📍 Sua região: <strong>{ipLocation.city} - {ipLocation.region}</strong></>
             ) : (
-              <>🚨 Encontre hospitais e atendimentos pediátricos próximos a você</>
+              <>Localiza os hospitais mais próximos em um só clique</>
             )}
           </CardDescription>
         </CardHeader>
@@ -265,7 +265,7 @@ const EmergencyMap = () => {
             ) : userLocation ? (
               <>
                 <Navigation className="w-4 h-4" />
-                Atualizar minha localização
+                Botão de emergência Mamãe Zen
               </>
             ) : (
               <>
