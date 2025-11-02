@@ -236,16 +236,7 @@ const Index = () => {
             </p>
             <p className="text-[10px] text-muted-foreground">
               {isUSA ? 'Developed with 💝 by' : 'Desenvolvido com 💝 por'}{' '}
-              <span className="text-primary font-semibold">Hemerson Deckson</span>{' '}
-              {isUSA ? 'with' : 'com'}{" "}
-              <a 
-                href="https://lovable.dev" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-primary hover:underline font-semibold"
-              >
-                Lovable.dev
-              </a>
+              <span className="text-primary font-semibold">Hemerson Deckson</span>
             </p>
             <Link to="/privacy">
               <Button variant="link" size="sm" className="text-[10px] h-auto p-0">
