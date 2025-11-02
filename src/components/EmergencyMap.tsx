@@ -246,7 +246,7 @@ const EmergencyMap = () => {
             {ipLocation ? (
               <>📍 Sua região: <strong>{ipLocation.city} - {ipLocation.region}</strong></>
             ) : (
-              <>Localiza os hospitais mais próximos em um só clique</>
+              <>Localize todos os hospitais de emergência em apenas um clique</>
             )}
           </CardDescription>
         </CardHeader>
@@ -270,7 +270,7 @@ const EmergencyMap = () => {
             ) : (
               <>
                 <MapPin className="w-4 h-4" />
-                Encontrar lugares próximos
+                Ativar botão de emergência Mamãe Zen
               </>
             )}
           </Button>
