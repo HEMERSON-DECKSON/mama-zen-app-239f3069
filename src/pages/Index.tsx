@@ -16,7 +16,7 @@ import AutismGuide from '@/components/AutismGuide';
 import EmergencyMap from '@/components/EmergencyMap';
 import AntiInspect from '@/components/AntiInspect';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin } from 'lucide-react';
+import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -123,6 +123,15 @@ const Index = () => {
             <p className="text-muted-foreground text-sm font-medium px-4">
               {isUSA ? '✨ Premium motherhood app ✨' : '✨ App premium de maternidade ✨'}
             </p>
+            <a 
+              href="https://www.instagram.com/app_mamae_zen?igsh=bGlydG9udHp3aXhs" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-pink-600 transition-colors"
+            >
+              <Instagram className="w-5 h-5" />
+              <span>@app_mamae_zen</span>
+            </a>
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs">PREMIUM</span>
             </div>
