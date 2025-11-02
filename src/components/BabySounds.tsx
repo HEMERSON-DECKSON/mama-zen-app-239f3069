@@ -36,7 +36,7 @@ const babySounds: Sound[] = [
     id: "heartbeat",
     name: "Para você mamãe",
     description: "Melodia especial para o coração",
-    youtubeId: "R9VhcHe6OpQ",
+    youtubeId: "P9nd2GbmLWU",
     icon: "❤️",
     quality: "Premium HD"
   },
