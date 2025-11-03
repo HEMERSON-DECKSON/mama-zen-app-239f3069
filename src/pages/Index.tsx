@@ -15,6 +15,7 @@ import MedicineGuide from '@/components/MedicineGuide';
 import AutismGuide from '@/components/AutismGuide';
 import EmergencyMap from '@/components/EmergencyMap';
 import AntiInspect from '@/components/AntiInspect';
+import InstallPrompt from '@/components/InstallPrompt';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram } from 'lucide-react';
 import { toast } from 'sonner';
@@ -135,6 +136,11 @@ const Index = () => {
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs">PREMIUM</span>
             </div>
+          </div>
+
+          {/* Install Prompt */}
+          <div className="animate-fade-in">
+            <InstallPrompt />
           </div>
 
           {/* Country Selector */}
