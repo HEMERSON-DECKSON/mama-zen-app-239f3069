@@ -13,6 +13,9 @@ const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetin
   const [greeting, setGreeting] = useState({ text: '', icon: Sun, gradient: 'var(--gradient-morning)' });
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // Sanitizar o nome do usuário para prevenir XSS
+  const sanitizedUserName = userName.replace(/[<>]/g, '').slice(0, 50);
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
@@ -23,24 +26,24 @@ const WelcomeGreeting = ({ userName = "Letícia", onMoodSelect }: WelcomeGreetin
     
     if (hour >= 5 && hour < 12) {
       setGreeting({
-        text: isUSA ? `Good morning, ${userName}! 🌸` : `Bom dia, ${userName}! 🌸`,
+        text: isUSA ? `Good morning, ${sanitizedUserName}! 🌸` : `Bom dia, ${sanitizedUserName}! 🌸`,
         icon: Sun,
         gradient: 'var(--gradient-morning)'
       });
     } else if (hour >= 12 && hour < 18) {
       setGreeting({
-        text: isUSA ? `Good afternoon, ${userName}! ☀️` : `Boa tarde, ${userName}! ☀️`,
+        text: isUSA ? `Good afternoon, ${sanitizedUserName}! ☀️` : `Boa tarde, ${sanitizedUserName}! ☀️`,
         icon: Sunset,
         gradient: 'var(--gradient-calm)'
       });
     } else {
       setGreeting({
-        text: isUSA ? `Good evening, ${userName}! 🌙` : `Boa noite, ${userName}! 🌙`,
+        text: isUSA ? `Good evening, ${sanitizedUserName}! 🌙` : `Boa noite, ${sanitizedUserName}! 🌙`,
         icon: Moon,
         gradient: 'var(--gradient-evening)'
       });
     }
-  }, [currentTime, userName, isUSA]);
+  }, [currentTime, sanitizedUserName, isUSA]);
 
   const moods = isUSA ? [
     { emoji: '😊', label: 'Good', value: 'good' },
