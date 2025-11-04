@@ -13,6 +13,7 @@ const InstallPrompt = () => {
   const { isUSA } = useCountry();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -29,7 +30,11 @@ const InstallPrompt = () => {
     window.addEventListener('beforeinstallprompt', handler);
 
     // Verifica se já está instalado
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    const checkInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+                          (window.navigator as any).standalone === true;
+    
+    setIsInstalled(checkInstalled);
+    if (checkInstalled) {
       setShowPrompt(false);
     }
 
@@ -37,7 +42,13 @@ const InstallPrompt = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      const message = isUSA 
+        ? 'To install: Open browser menu → "Install App" or "Add to Home Screen"' 
+        : 'Para instalar: Abra o menu do navegador → "Instalar app" ou "Adicionar à tela inicial"';
+      toast.info(message, { duration: 5000 });
+      return;
+    }
 
     deferredPrompt.prompt();
     
@@ -48,6 +59,7 @@ const InstallPrompt = () => {
         ? 'App installed successfully! 🎉' 
         : 'App instalado com sucesso! 🎉';
       toast.success(message);
+      setIsInstalled(true);
     }
     
     setDeferredPrompt(null);
@@ -59,8 +71,18 @@ const InstallPrompt = () => {
     localStorage.setItem('installPromptDismissed', 'true');
   };
 
-  if (!showPrompt) return null;
+  // Se já está instalado, não mostra nada
+  if (isInstalled) {
+    return (
+      <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          ✅ {isUSA ? 'App installed!' : 'App instalado!'}
+        </p>
+      </div>
+    );
+  }
 
+  // Sempre mostra o botão de instalação, mesmo sem o prompt
   return (
     <div className="animate-scale-in bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 p-[2px] rounded-xl shadow-lg">
       <div className="bg-white dark:bg-gray-900 rounded-xl p-4 relative">
