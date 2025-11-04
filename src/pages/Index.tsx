@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCountry } from '@/contexts/CountryContext';
 import WelcomeGreeting from '@/components/WelcomeGreeting';
 import CountrySelector from '@/components/CountrySelector';
+import ThemeSelector from '@/components/ThemeSelector';
 import { Button } from '@/components/ui/button';
 import MusicPlayer from '@/components/MusicPlayer';
 import RoutineCalendar from '@/components/RoutineCalendar';
@@ -125,7 +126,7 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
+      <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--bg-gradient-start))] via-[hsl(var(--bg-gradient-middle))] to-[hsl(var(--bg-gradient-end))] dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 transition-colors duration-500">
         <div className="w-full max-w-md mx-auto p-4 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2 animate-fade-in pt-2">
@@ -151,6 +152,11 @@ const Index = () => {
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs">PREMIUM</span>
             </div>
+          </div>
+
+          {/* Theme Selector */}
+          <div className="animate-fade-in">
+            <ThemeSelector />
           </div>
 
           {/* Country Selector */}
