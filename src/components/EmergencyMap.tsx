@@ -384,19 +384,10 @@ const EmergencyMap = () => {
                 
                 <div className="flex gap-2">
                   <Button 
-                    onClick={() => callPhone(place.phone)} 
-                    size="sm" 
-                    variant="default"
-                    className="flex-1"
-                  >
-                    <Phone className="w-3 h-3" />
-                    Ligar
-                  </Button>
-                  <Button 
                     onClick={() => openInMaps(place)} 
                     size="sm" 
-                    variant="outline"
-                    className="flex-1"
+                    variant="default"
+                    className="w-full"
                   >
                     <Navigation className="w-3 h-3" />
                     Rotas
