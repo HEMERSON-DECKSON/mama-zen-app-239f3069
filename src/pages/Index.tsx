@@ -5,6 +5,7 @@ import WelcomeGreeting from '@/components/WelcomeGreeting';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeSelector from '@/components/ThemeSelector';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import MusicPlayer from '@/components/MusicPlayer';
 import RoutineCalendar from '@/components/RoutineCalendar';
 import GuideLibrary from '@/components/GuideLibrary';
@@ -15,9 +16,10 @@ import FeedingTracker from '@/components/FeedingTracker';
 import MedicineGuide from '@/components/MedicineGuide';
 import AutismGuide from '@/components/AutismGuide';
 import EmergencyMap from '@/components/EmergencyMap';
+import PharmacyMap from '@/components/PharmacyMap';
 import AntiInspect from '@/components/AntiInspect';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram } from 'lucide-react';
+import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -173,7 +175,7 @@ const Index = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="guides" className="animate-fade-in">
-            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1">
+            <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1">
               <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs">
                 <Baby className="w-4 h-4" />
                 <span>{isUSA ? 'Guides' : 'Guias'}</span>
@@ -186,9 +188,20 @@ const Index = () => {
                 <Pill className="w-4 h-4" />
                 <span>{isUSA ? 'Medicine' : 'Remédios'}</span>
               </TabsTrigger>
+            </TabsList>
+
+            <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1 mt-2">
               <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs">
                 <MapPin className="w-4 h-4" />
                 <span>{isUSA ? 'Emergency' : 'Emergência'}</span>
+              </TabsTrigger>
+              <TabsTrigger value="pharmacy" className="flex-col gap-1 py-2 px-1 text-xs">
+                <Cross className="w-4 h-4" />
+                <span>{isUSA ? 'Pharmacy' : 'Farmácia'}</span>
+              </TabsTrigger>
+              <TabsTrigger value="shop" className="flex-col gap-1 py-2 px-1 text-xs">
+                <ShoppingBag className="w-4 h-4" />
+                <span>{isUSA ? 'Shop' : 'Lojinha'}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -197,6 +210,40 @@ const Index = () => {
               <TabsContent value="sounds" className="mt-0"><BabySounds /></TabsContent>
               <TabsContent value="medicine" className="mt-0"><MedicineGuide /></TabsContent>
               <TabsContent value="emergency" className="mt-0"><EmergencyMap /></TabsContent>
+              <TabsContent value="pharmacy" className="mt-0"><PharmacyMap /></TabsContent>
+              <TabsContent value="shop" className="mt-0">
+                <Card className="p-6 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 border-pink-200 dark:border-pink-800">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-pink-700 dark:text-pink-300">
+                      <ShoppingBag className="w-6 h-6" />
+                      <h3 className="font-semibold text-xl">
+                        {isUSA ? 'Mom Shop' : 'Lojinha da Mamãe'}
+                      </h3>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      {isUSA 
+                        ? 'Discover amazing products selected especially for you and your baby!'
+                        : 'Descubra produtos incríveis selecionados especialmente para você e seu bebê!'}
+                    </p>
+
+                    <Button 
+                      onClick={() => window.open('https://collshp.com/mamaezenshopping', '_blank')}
+                      className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-6"
+                      size="lg"
+                    >
+                      <ShoppingBag className="w-5 h-5 mr-2" />
+                      {isUSA ? 'Visit Shop' : 'Visitar Lojinha'}
+                    </Button>
+
+                    <p className="text-xs text-center text-muted-foreground">
+                      {isUSA 
+                        ? '✨ Special products for moms and babies'
+                        : '✨ Produtos especiais para mamães e bebês'}
+                    </p>
+                  </div>
+                </Card>
+              </TabsContent>
             </div>
 
             {/* Secondary Tabs - Collapsible */}
