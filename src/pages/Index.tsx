@@ -175,7 +175,7 @@ const Index = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="guides" className="animate-fade-in">
-            <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1">
+            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1">
               <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs">
                 <Baby className="w-4 h-4" />
                 <span>{isUSA ? 'Guides' : 'Guias'}</span>
@@ -188,13 +188,13 @@ const Index = () => {
                 <Pill className="w-4 h-4" />
                 <span>{isUSA ? 'Medicine' : 'Remédios'}</span>
               </TabsTrigger>
-            </TabsList>
-
-            <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1 mt-2">
               <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs">
                 <MapPin className="w-4 h-4" />
                 <span>{isUSA ? 'Emergency' : 'Emergência'}</span>
               </TabsTrigger>
+            </TabsList>
+
+            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1 mt-2">
               <TabsTrigger value="pharmacy" className="flex-col gap-1 py-2 px-1 text-xs">
                 <Cross className="w-4 h-4" />
                 <span>{isUSA ? 'Pharmacy' : 'Farmácia'}</span>
