@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Navigation, Search, Loader2 } from 'lucide-react';
+import { MapPin, Navigation, Loader2 } from 'lucide-react';
 import { useCountry } from '@/contexts/CountryContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 
@@ -21,7 +20,6 @@ const PharmacyMap = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     getCurrentLocation();
@@ -61,10 +59,9 @@ const PharmacyMap = () => {
     setLoading(true);
     try {
       const searchTerm = isUSA ? 'pharmacy' : 'farmácia';
-      const query = searchQuery || searchTerm;
       
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=20&lat=${location.lat}&lon=${location.lng}&bounded=1&viewbox=${location.lng - 0.1},${location.lat - 0.1},${location.lng + 0.1},${location.lat + 0.1}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}&limit=20&lat=${location.lat}&lon=${location.lng}&bounded=1&viewbox=${location.lng - 0.1},${location.lat - 0.1},${location.lng + 0.1},${location.lat + 0.1}`
       );
       
       if (!response.ok) throw new Error('Search failed');
@@ -97,8 +94,8 @@ const PharmacyMap = () => {
       
       if (pharmacyList.length === 0) {
         const message = isUSA 
-          ? 'No pharmacies found nearby. Try searching for a specific area.'
-          : 'Nenhuma farmácia encontrada próxima. Tente buscar por uma área específica.';
+          ? 'No pharmacies found nearby.'
+          : 'Nenhuma farmácia encontrada próxima.';
         toast.info(message);
       } else {
         const message = isUSA 
@@ -152,41 +149,23 @@ const PharmacyMap = () => {
           <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
             <MapPin className="w-5 h-5" />
             <h3 className="font-semibold text-lg">
-              {isUSA ? 'Find Nearby Pharmacies' : 'Encontrar Farmácias Próximas'}
+              {isUSA ? 'Nearby Pharmacies' : 'Farmácias Próximas'}
             </h3>
           </div>
           
           <p className="text-sm text-muted-foreground">
             {isUSA 
-              ? 'Find pharmacies near you quickly and safely'
-              : 'Encontre farmácias próximas a você de forma rápida e segura'}
+              ? 'Find pharmacies near you automatically using GPS'
+              : 'Encontre farmácias próximas a você automaticamente via GPS'}
           </p>
-
-          <div className="flex gap-2">
-            <Input
-              placeholder={isUSA ? "Search for area or pharmacy..." : "Buscar por área ou farmácia..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1"
-            />
-            <Button 
-              onClick={handleSearch}
-              disabled={loading}
-              size="icon"
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
-          </div>
 
           {!userLocation && !loading && (
             <Button 
               onClick={getCurrentLocation}
               className="w-full"
-              variant="outline"
             >
               <MapPin className="w-4 h-4 mr-2" />
-              {isUSA ? 'Enable Location' : 'Ativar Localização'}
+              {isUSA ? 'Find Pharmacies' : 'Buscar Farmácias'}
             </Button>
           )}
         </div>
