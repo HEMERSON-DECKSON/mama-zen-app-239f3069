@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MapPin, Navigation, Loader2 } from 'lucide-react';
 import { useCountry } from '@/contexts/CountryContext';
 import { Button } from '@/components/ui/button';
@@ -20,12 +20,12 @@ const PharmacyMap = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
+  const [isActivated, setIsActivated] = useState(false);
 
   const getCurrentLocation = () => {
+    if (!isActivated) {
+      setIsActivated(true);
+    }
     setLoading(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -36,12 +36,16 @@ const PharmacyMap = () => {
           };
           setUserLocation(location);
           searchNearbyPharmacies(location);
+          const message = isUSA 
+            ? '📍 Your location has been found'
+            : '📍 Sua localização foi encontrada';
+          toast.success(message);
         },
         (error) => {
           console.error('Error getting location:', error);
           const message = isUSA 
-            ? 'Could not get your location. Please enable location services.'
-            : 'Não foi possível obter sua localização. Por favor, habilite os serviços de localização.';
+            ? 'Could not get your location. Please enable GPS.'
+            : 'Não foi possível obter sua localização. Ative o GPS.';
           toast.error(message);
           setLoading(false);
         }
@@ -134,42 +138,82 @@ const PharmacyMap = () => {
     window.open(url, '_blank');
   };
 
-  const handleSearch = () => {
-    if (userLocation) {
-      searchNearbyPharmacies(userLocation);
-    } else {
-      getCurrentLocation();
-    }
-  };
-
   return (
     <div className="space-y-4">
-      <Card className="p-4 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950/20 dark:to-teal-950/20 border-green-200 dark:border-green-800">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-            <MapPin className="w-5 h-5" />
-            <h3 className="font-semibold text-lg">
-              {isUSA ? 'Nearby Pharmacies' : 'Farmácias Próximas'}
-            </h3>
-          </div>
-          
-          <p className="text-sm text-muted-foreground">
-            {isUSA 
-              ? 'Find pharmacies near you automatically using GPS'
-              : 'Encontre farmácias próximas a você automaticamente via GPS'}
-          </p>
+      {!isActivated ? (
+        <Card className="border-0 shadow-[var(--shadow-elegant)] bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+          <div className="p-8 text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+                <MapPin className="w-10 h-10 text-white" />
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-2xl font-bold text-foreground mb-2">
+                {isUSA ? 'Find Pharmacies' : 'Localizar Farmácias'}
+              </h3>
+              <p className="text-muted-foreground">
+                {isUSA 
+                  ? 'Find pharmacies near you with your real-time location'
+                  : 'Encontre farmácias próximas com sua localização em tempo real'}
+              </p>
+            </div>
 
-          {!userLocation && !loading && (
             <Button 
               onClick={getCurrentLocation}
-              className="w-full"
+              size="lg"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-6 shadow-lg"
             >
-              <MapPin className="w-4 h-4 mr-2" />
-              {isUSA ? 'Find Pharmacies' : 'Buscar Farmácias'}
+              <MapPin className="w-5 h-5 mr-2" />
+              {isUSA ? 'Activate Location' : 'Ativar Localização'}
             </Button>
-          )}
-        </div>
-      </Card>
+
+            <p className="text-xs text-muted-foreground">
+              {isUSA 
+                ? '🔒 Your location data is safe and will only be used to find nearby pharmacies'
+                : '🔒 Seus dados de localização são seguros e serão usados apenas para encontrar farmácias próximas'}
+            </p>
+          </div>
+        </Card>
+      ) : (
+        <Card className="border-0 shadow-[var(--shadow-soft)] bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                <MapPin className="w-5 h-5" />
+                <h3 className="font-semibold text-lg">
+                  {isUSA ? 'Nearby Pharmacies' : 'Farmácias Próximas'}
+                </h3>
+              </div>
+              {userLocation && (
+                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs font-medium">
+                    {isUSA ? 'Live Location' : 'Localização Ativa'}
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            <p className="text-sm text-muted-foreground">
+              {isUSA 
+                ? 'Pharmacies near your current location'
+                : 'Farmácias próximas da sua localização atual'}
+            </p>
+
+            <Button 
+              onClick={getCurrentLocation}
+              variant="outline"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <MapPin className="w-4 h-4 mr-2" />}
+              {isUSA ? 'Update Location' : 'Atualizar Localização'}
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {loading && (
         <Card className="p-8">
@@ -220,7 +264,7 @@ const PharmacyMap = () => {
                     variant="default"
                     className="w-full"
                   >
-                    <Navigation className="w-3 h-3" />
+                    <Navigation className="w-3 h-3 mr-2" />
                     {isUSA ? 'Get Directions' : 'Rotas'}
                   </Button>
                 </div>
