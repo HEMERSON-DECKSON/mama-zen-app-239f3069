@@ -180,18 +180,26 @@ const EmergencyMap = () => {
       return;
     }
 
-    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
     
-    if (isMobile) {
-      // Tenta abrir no app do Google Maps primeiro
-      window.location.href = `google.navigation:q=${place.lat},${place.lng}&label=${encodeURIComponent(place.name)}`;
+    if (isIOS) {
+      // iOS: usar URL universal do Google Maps que funciona tanto no app quanto no browser
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`;
+      window.open(mapsUrl, '_blank');
+    } else if (isAndroid) {
+      // Android: tentar abrir no app do Google Maps primeiro
+      const intentUrl = `google.navigation:q=${place.lat},${place.lng}`;
+      window.location.href = intentUrl;
       // Fallback para browser após 1 segundo
       setTimeout(() => {
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`, '_blank');
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`;
+        window.open(mapsUrl, '_blank');
       }, 1000);
     } else {
-      // Desktop: abre direto no browser com rotas
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`, '_blank');
+      // Desktop: abrir direto no browser com rotas
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
+      window.open(mapsUrl, '_blank');
     }
   };
 

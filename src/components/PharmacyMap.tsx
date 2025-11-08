@@ -27,9 +27,28 @@ const PharmacyMap = () => {
       setIsActivated(true);
     }
     setLoading(true);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
+    
+    if (!navigator.geolocation) {
+      const message = isUSA 
+        ? 'Geolocation is not supported by your browser'
+        : 'Geolocalização não é suportada pelo seu navegador';
+      toast.error(message);
+      setLoading(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      const message = isUSA 
+        ? 'Location request timed out. Please try again.'
+        : 'Tempo esgotado. Tente novamente.';
+      toast.error(message);
+      setLoading(false);
+    }, 10000);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        clearTimeout(timeoutId);
+        try {
           const location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
@@ -40,23 +59,37 @@ const PharmacyMap = () => {
             ? '📍 Your location has been found'
             : '📍 Sua localização foi encontrada';
           toast.success(message);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+        } catch (err) {
+          console.error('Error processing location:', err);
           const message = isUSA 
-            ? 'Could not get your location. Please enable GPS.'
-            : 'Não foi possível obter sua localização. Ative o GPS.';
+            ? 'Error processing location. Please try again.'
+            : 'Erro ao processar localização. Tente novamente.';
           toast.error(message);
           setLoading(false);
         }
-      );
-    } else {
-      const message = isUSA 
-        ? 'Geolocation is not supported by your browser'
-        : 'Geolocalização não é suportada pelo seu navegador';
-      toast.error(message);
-      setLoading(false);
-    }
+      },
+      (error) => {
+        clearTimeout(timeoutId);
+        console.error('Error getting location:', error);
+        let message = isUSA 
+          ? 'Could not get your location. Please enable GPS.'
+          : 'Não foi possível obter sua localização. Ative o GPS.';
+        
+        if (error.code === error.PERMISSION_DENIED) {
+          message = isUSA 
+            ? 'Location permission denied. Please enable in settings.'
+            : 'Permissão de localização negada. Ative nas configurações.';
+        }
+        
+        toast.error(message);
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
   const searchNearbyPharmacies = async (location: { lat: number; lng: number }) => {
