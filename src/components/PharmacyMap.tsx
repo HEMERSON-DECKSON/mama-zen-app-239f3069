@@ -141,7 +141,9 @@ const PharmacyMap = () => {
         toast.success(message);
       }
     } catch (error) {
-      console.error('Error searching pharmacies:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error searching pharmacies:', error);
+        }
       const message = isUSA 
         ? 'Error searching for pharmacies. Please try again.'
         : 'Erro ao buscar farmácias. Por favor, tente novamente.';

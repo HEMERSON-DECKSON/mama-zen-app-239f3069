@@ -17,9 +17,10 @@ import MedicineGuide from '@/components/MedicineGuide';
 import AutismGuide from '@/components/AutismGuide';
 import EmergencyMap from '@/components/EmergencyMap';
 import PharmacyMap from '@/components/PharmacyMap';
+import NotificationCenter from '@/components/NotificationCenter';
 import AntiInspect from '@/components/AntiInspect';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross } from 'lucide-react';
+import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -175,43 +176,48 @@ const Index = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="guides" className="animate-fade-in">
-            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1">
-              <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs">
+            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1 bg-gradient-to-r from-pink-100/50 via-purple-100/50 to-blue-100/50 dark:from-pink-950/30 dark:via-purple-950/30 dark:to-blue-950/30">
+              <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <Baby className="w-4 h-4" />
                 <span>{isUSA ? 'Guides' : 'Guias'}</span>
               </TabsTrigger>
-              <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs">
+              <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <Heart className="w-4 h-4" />
                 <span>{isUSA ? 'Sounds' : 'Sons'}</span>
               </TabsTrigger>
-              <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs">
+              <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <Pill className="w-4 h-4" />
                 <span>{isUSA ? 'Medicine' : 'Remédios'}</span>
               </TabsTrigger>
-              <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs">
+              <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <MapPin className="w-4 h-4" />
                 <span>{isUSA ? 'Emergency' : 'Emergência'}</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1 mt-2">
-              <TabsTrigger value="pharmacy" className="flex-col gap-1 py-2 px-1 text-xs">
+            <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1 mt-2 bg-gradient-to-r from-pink-100/50 via-purple-100/50 to-blue-100/50 dark:from-pink-950/30 dark:via-purple-950/30 dark:to-blue-950/30">
+              <TabsTrigger value="notifications" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+                <Bell className="w-4 h-4" />
+                <span>{isUSA ? 'Reminders' : 'Lembretes'}</span>
+              </TabsTrigger>
+              <TabsTrigger value="pharmacy" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <Cross className="w-4 h-4" />
                 <span>{isUSA ? 'Pharmacy' : 'Farmácia'}</span>
               </TabsTrigger>
-              <TabsTrigger value="shop" className="flex-col gap-1 py-2 px-1 text-xs">
+              <TabsTrigger value="shop" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <ShoppingBag className="w-4 h-4" />
                 <span>{isUSA ? 'Shop' : 'Lojinha'}</span>
               </TabsTrigger>
             </TabsList>
 
             <div className="mt-4">
-              <TabsContent value="guides" className="mt-0"><PracticalGuides /></TabsContent>
-              <TabsContent value="sounds" className="mt-0"><BabySounds /></TabsContent>
-              <TabsContent value="medicine" className="mt-0"><MedicineGuide /></TabsContent>
-              <TabsContent value="emergency" className="mt-0"><EmergencyMap /></TabsContent>
-              <TabsContent value="pharmacy" className="mt-0"><PharmacyMap /></TabsContent>
-              <TabsContent value="shop" className="mt-0">
+              <TabsContent value="guides" className="mt-0 animate-fade-in"><PracticalGuides /></TabsContent>
+              <TabsContent value="sounds" className="mt-0 animate-fade-in"><BabySounds /></TabsContent>
+              <TabsContent value="medicine" className="mt-0 animate-fade-in"><MedicineGuide /></TabsContent>
+              <TabsContent value="emergency" className="mt-0 animate-fade-in"><EmergencyMap /></TabsContent>
+              <TabsContent value="notifications" className="mt-0 animate-fade-in"><NotificationCenter /></TabsContent>
+              <TabsContent value="pharmacy" className="mt-0 animate-fade-in"><PharmacyMap /></TabsContent>
+              <TabsContent value="shop" className="mt-0 animate-fade-in">
                 <Card className="p-6 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 border-pink-200 dark:border-pink-800">
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-pink-700 dark:text-pink-300">

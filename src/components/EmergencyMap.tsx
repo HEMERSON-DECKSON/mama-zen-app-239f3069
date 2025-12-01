@@ -68,7 +68,7 @@ const EmergencyMap = () => {
 
   const searchNearbyHospitals = async (lat: number, lng: number, city: string, region: string) => {
     try {
-      // Usando Overpass API (OpenStreetMap) para buscar hospitais - GRATUITO!
+      // Usando Overpass API para buscar TODAS unidades de saúde próximas - GRATUITO!
       const radius = 10000; // 10km de raio
       const query = `
         [out:json][timeout:25];
@@ -77,8 +77,16 @@ const EmergencyMap = () => {
           way["amenity"="hospital"](around:${radius},${lat},${lng});
           node["amenity"="clinic"](around:${radius},${lat},${lng});
           way["amenity"="clinic"](around:${radius},${lat},${lng});
+          node["amenity"="doctors"](around:${radius},${lat},${lng});
+          way["amenity"="doctors"](around:${radius},${lat},${lng});
           node["healthcare"="hospital"](around:${radius},${lat},${lng});
           way["healthcare"="hospital"](around:${radius},${lat},${lng});
+          node["healthcare"="clinic"](around:${radius},${lat},${lng});
+          way["healthcare"="clinic"](around:${radius},${lat},${lng});
+          node["healthcare"="centre"](around:${radius},${lat},${lng});
+          way["healthcare"="centre"](around:${radius},${lat},${lng});
+          node["healthcare"="doctor"](around:${radius},${lat},${lng});
+          way["healthcare"="doctor"](around:${radius},${lat},${lng});
         );
         out center;
       `;
@@ -90,14 +98,24 @@ const EmergencyMap = () => {
       
       const data = await response.json();
       
-      const hospitals: Emergency[] = data.elements.map((element: any) => {
+      const healthUnits: Emergency[] = data.elements.map((element: any) => {
         const elementLat = element.lat || element.center?.lat;
         const elementLng = element.lon || element.center?.lon;
         const distance = calculateDistance(lat, lng, elementLat, elementLng);
         
+        // Determinar tipo baseado nas tags
+        let type: Emergency["type"] = "hospital";
+        if (element.tags?.amenity === "clinic" || element.tags?.healthcare === "clinic") {
+          type = "clinica";
+        } else if (element.tags?.amenity === "doctors" || element.tags?.healthcare === "doctor") {
+          type = "clinica";
+        } else if (element.tags?.healthcare === "centre") {
+          type = "pronto-socorro";
+        }
+        
         return {
-          name: element.tags?.name || "Hospital sem nome",
-          type: element.tags?.amenity === "clinic" ? "clinica" : "hospital" as any,
+          name: element.tags?.name || element.tags?.["name:en"] || "Unidade sem nome",
+          type,
           phone: element.tags?.phone || element.tags?.["contact:phone"] || "Não disponível",
           address: `${element.tags?.["addr:street"] || ""} ${element.tags?.["addr:housenumber"] || ""}, ${city} - ${region}`.trim(),
           lat: elementLat,
@@ -105,14 +123,18 @@ const EmergencyMap = () => {
           distance,
           isPublic: element.tags?.["healthcare:funding"] === "public" || 
                    element.tags?.operator?.toLowerCase().includes("sus") ||
-                   element.tags?.operator?.toLowerCase().includes("público")
+                   element.tags?.operator?.toLowerCase().includes("público") ||
+                   element.tags?.operator?.toLowerCase().includes("ubs") ||
+                   element.tags?.name?.toLowerCase().includes("ubs")
         };
-      }).filter((h: Emergency) => h.name !== "Hospital sem nome");
+      }).filter((h: Emergency) => h.name !== "Unidade sem nome" && h.lat && h.lng);
 
-      return hospitals.sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 10);
+      return healthUnits.sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 15);
     } catch (error) {
-      console.error("Erro ao buscar hospitais:", error);
-      toast.error("Erro ao buscar hospitais próximos");
+      if (import.meta.env.DEV) {
+        console.error("Erro ao buscar unidades de saúde:", error);
+      }
+      toast.error("Erro ao buscar unidades próximas");
       return [];
     }
   };
@@ -150,9 +172,9 @@ const EmergencyMap = () => {
       
       if (hospitals.length > 0) {
         setNearbyPlaces(hospitals);
-        toast.success(`✅ Encontrados ${hospitals.length} hospitais/clínicas em ${ipData.city}!`);
+        toast.success(`✅ Encontradas ${hospitals.length} unidades de saúde em ${ipData.city}!`);
       } else {
-        toast.warning("Nenhum hospital encontrado próximo. Tente novamente.");
+        toast.warning("Nenhuma unidade encontrada próxima. Tente novamente.");
       }
       
     } catch (error) {
@@ -248,13 +270,13 @@ const EmergencyMap = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Hospital className="w-5 h-5 text-red-600 dark:text-red-400" />
-            <CardTitle className="text-lg text-red-700 dark:text-red-400">Localize os postos emergenciais mais próximos</CardTitle>
+            <CardTitle className="text-lg text-red-700 dark:text-red-400">Todas as unidades de saúde próximas</CardTitle>
           </div>
           <CardDescription className="text-xs leading-relaxed">
             {ipLocation ? (
               <>📍 Sua região: <strong>{ipLocation.city} - {ipLocation.region}</strong></>
             ) : (
-              <>Localize todos os hospitais de emergência em apenas um clique</>
+              <>Hospitais, clínicas, UBS e pronto-socorros em um só lugar</>
             )}
           </CardDescription>
         </CardHeader>
@@ -262,23 +284,23 @@ const EmergencyMap = () => {
           <Button 
             onClick={getLocation} 
             disabled={loading}
-            className="w-full"
-            variant={userLocation ? "secondary" : "default"}
+            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all duration-300"
+            size="lg"
           >
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Obtendo localização...
+                Buscando unidades próximas...
               </>
             ) : userLocation ? (
               <>
                 <Navigation className="w-4 h-4" />
-                Botão de emergência Mamãe Zen
+                🚨 Atualizar localização
               </>
             ) : (
               <>
-                <MapPin className="w-4 h-4" />
-                Ativar botão de emergência Mamãe Zen
+                <Hospital className="w-4 h-4" />
+                🚨 Emergência - Ativar busca
               </>
             )}
           </Button>
@@ -359,13 +381,15 @@ const EmergencyMap = () => {
       {/* Lista de Hospitais e Clínicas */}
       <div className="space-y-2">
         {nearbyPlaces.length > 0 && (
-          <h3 className="text-sm font-semibold px-1">
-            {userLocation && ipLocation ? (
-              <>📍 Hospitais em {ipLocation.city} - {ipLocation.region}:</>
-            ) : (
-              <>🏥 Clique no botão acima para buscar hospitais da sua região</>
-            )}
-          </h3>
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+            <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">
+              {userLocation && ipLocation ? (
+                <>📍 {nearbyPlaces.length} unidades encontradas em {ipLocation.city} - {ipLocation.region}</>
+              ) : (
+                <>🏥 Clique no botão acima para encontrar todas unidades de saúde próximas</>
+              )}
+            </h3>
+          </div>
         )}
         {nearbyPlaces.map((place, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow">
