@@ -151,29 +151,23 @@ const MusicPlayer = () => {
         play();
       }
     } else {
+      if (!isAPIReady) {
+        toast.error('Player carregando, tente novamente em 1 segundo');
+        return;
+      }
+
       setCurrentTrack(track);
       
-      // Aguarda um pouco para garantir que a API está pronta
-      const tryInitialize = () => {
-        if (!isAPIReady) {
-          console.log('Aguardando API do YouTube ficar pronta...');
-          setTimeout(tryInitialize, 500);
-          return;
-        }
-        
-        initializePlayer({
-          videoId: track.id,
-          volume: volume[0],
-          onReady: () => {
-            console.log('Música carregada com sucesso!');
-            toast.success(`🎵 ${track.title}`, {
-              description: `Por ${track.artist}`,
-            });
-          },
-        });
-      };
-      
-      setTimeout(tryInitialize, 100);
+      initializePlayer({
+        videoId: track.id,
+        volume: volume[0],
+        onReady: () => {
+          console.log('Música carregada com sucesso!');
+          toast.success(`🎵 ${track.title}`, {
+            description: `Por ${track.artist}`,
+          });
+        },
+      });
     }
   };
 

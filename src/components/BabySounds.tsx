@@ -103,30 +103,26 @@ export default function BabySounds() {
       }
     } else {
       // Troca de som
+      if (!isAPIReady) {
+        toast({
+          title: 'Carregando player do YouTube',
+          description: 'Aguarde 1 segundo e toque novamente no som.',
+        });
+        return;
+      }
+
       setCurrentSound(sound);
 
-      // Aguarda a API do YouTube ficar pronta antes de iniciar
-      const tryInitialize = () => {
-        if (!isAPIReady) {
-          console.log('Aguardando API do YouTube (BabySounds)...');
-          setTimeout(tryInitialize, 300);
-          return;
-        }
-
-        initializePlayer({
-          videoId: sound.youtubeId,
-          volume: volume[0],
-          onReady: () => {
-            toast({
-              title: `🎵 ${sound.name}`,
-              description: `${sound.description} - ${sound.quality}`,
-            });
-          },
-        });
-      };
-
-      // Pequeno delay para garantir que o DOM está pronto
-      setTimeout(tryInitialize, 100);
+      initializePlayer({
+        videoId: sound.youtubeId,
+        volume: volume[0],
+        onReady: () => {
+          toast({
+            title: `🎵 ${sound.name}`,
+            description: `${sound.description} - ${sound.quality}`,
+          });
+        },
+      });
     }
   };
 
