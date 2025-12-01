@@ -10,7 +10,7 @@ import MusicPlayer from '@/components/MusicPlayer';
 import RoutineCalendar from '@/components/RoutineCalendar';
 import GuideLibrary from '@/components/GuideLibrary';
 import PracticalGuides from '@/components/PracticalGuides';
-import BabySounds from '@/components/BabySounds';
+
 import SleepTracker from '@/components/SleepTracker';
 import FeedingTracker from '@/components/FeedingTracker';
 import MedicineGuide from '@/components/MedicineGuide';
@@ -20,7 +20,7 @@ import PharmacyMap from '@/components/PharmacyMap';
 import NotificationCenter from '@/components/NotificationCenter';
 import AntiInspect from '@/components/AntiInspect';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Heart, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross, Bell } from 'lucide-react';
+import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -182,8 +182,8 @@ const Index = () => {
                 <span>{isUSA ? 'Guides' : 'Guias'}</span>
               </TabsTrigger>
               <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
-                <Heart className="w-4 h-4" />
-                <span>{isUSA ? 'Sounds' : 'Sons'}</span>
+                <Music className="w-4 h-4" />
+                <span>{isUSA ? 'Music' : 'Músicas'}</span>
               </TabsTrigger>
               <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
                 <Pill className="w-4 h-4" />
@@ -212,7 +212,7 @@ const Index = () => {
 
             <div className="mt-4">
               <TabsContent value="guides" className="mt-0 animate-fade-in"><PracticalGuides /></TabsContent>
-              <TabsContent value="sounds" className="mt-0 animate-fade-in"><BabySounds /></TabsContent>
+              <TabsContent value="sounds" className="mt-0 animate-fade-in"><MusicPlayer /></TabsContent>
               <TabsContent value="medicine" className="mt-0 animate-fade-in"><MedicineGuide /></TabsContent>
               <TabsContent value="emergency" className="mt-0 animate-fade-in"><EmergencyMap /></TabsContent>
               <TabsContent value="notifications" className="mt-0 animate-fade-in"><NotificationCenter /></TabsContent>
@@ -277,10 +277,6 @@ const Index = () => {
                       <Calendar className="w-4 h-4" />
                       <span>{isUSA ? 'Routine' : 'Rotina'}</span>
                     </TabsTrigger>
-                    <TabsTrigger value="music" className="flex-col gap-1 py-2 text-xs">
-                      <Music className="w-4 h-4" />
-                      <span>{isUSA ? 'Music' : 'Músicas'}</span>
-                    </TabsTrigger>
                     <TabsTrigger value="ebook" className="flex-col gap-1 py-2 text-xs">
                       <BookOpen className="w-4 h-4" />
                       <span>{isUSA ? 'E-book' : 'E-book'}</span>
@@ -290,7 +286,6 @@ const Index = () => {
                   <TabsContent value="feeding" className="mt-2"><FeedingTracker /></TabsContent>
                   <TabsContent value="autism" className="mt-2"><AutismGuide /></TabsContent>
                   <TabsContent value="routine" className="mt-2"><RoutineCalendar /></TabsContent>
-                  <TabsContent value="music" className="mt-2"><MusicPlayer /></TabsContent>
                   <TabsContent value="ebook" className="mt-2"><GuideLibrary /></TabsContent>
                 </div>
               </details>

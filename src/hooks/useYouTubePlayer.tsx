@@ -63,9 +63,9 @@ export const useYouTubePlayer = () => {
     }
 
     console.log('Criando player do YouTube...');
-    const newPlayer = new window.YT.Player(containerRef.current, {
-      height: '0',
-      width: '0',
+    const newPlayer = new window.YT.Player(container, {
+      height: '1',
+      width: '1',
       videoId: options.videoId,
       playerVars: {
         autoplay: 1,
@@ -79,6 +79,7 @@ export const useYouTubePlayer = () => {
         iv_load_policy: 3,
         loop: 1,
         playlist: options.videoId, // necessário para loop funcionar
+        origin: window.location.origin,
       },
       events: {
         onReady: (event: any) => {
