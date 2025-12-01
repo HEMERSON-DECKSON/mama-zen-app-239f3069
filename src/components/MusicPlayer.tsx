@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Play, Pause, Search, Music, Volume2, X, Loader2, Library } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
-import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -28,54 +27,58 @@ interface Sound {
 
 const sleepTracks: Sound[] = [
   {
-    id: "white-noise",
-    name: "Ruído Branco",
-    description: "Som contínuo que acalma o bebê",
-    youtubeId: "nMfPqeZjc2c",
-    icon: "🌊",
-    quality: "10h 4K"
+    id: 'white-noise',
+    name: 'Ruído Branco',
+    description: 'Som contínuo que acalma o bebê',
+    youtubeId: 'nMfPqeZjc2c',
+    icon: '🌊',
+    quality: '10h 4K',
   },
   {
-    id: "rain",
-    name: "Chuva Suave",
-    description: "Som relaxante de chuva caindo",
-    youtubeId: "mPZkdNFkNps",
-    icon: "🌧️",
-    quality: "10h 4K"
+    id: 'rain',
+    name: 'Chuva Suave',
+    description: 'Som relaxante de chuva caindo',
+    youtubeId: 'mPZkdNFkNps',
+    icon: '🌧️',
+    quality: '10h 4K',
   },
   {
-    id: "heartbeat",
-    name: "Para você mamãe",
-    description: "Melodia especial para o coração",
-    youtubeId: "P9nd2GbmLWU",
-    icon: "❤️",
-    quality: "Premium HD"
+    id: 'heartbeat',
+    name: 'Para você mamãe',
+    description: 'Melodia especial para o coração',
+    youtubeId: 'P9nd2GbmLWU',
+    icon: '❤️',
+    quality: 'Premium HD',
   },
   {
-    id: "lullaby",
-    name: "Canção de Ninar",
-    description: "Melodia suave para dormir",
-    youtubeId: "sgfMb2WycDo",
-    icon: "🎵",
-    quality: "HD"
+    id: 'lullaby',
+    name: 'Canção de Ninar',
+    description: 'Melodia suave para dormir',
+    youtubeId: 'sgfMb2WycDo',
+    icon: '🎵',
+    quality: 'HD',
   },
   {
-    id: "ocean",
-    name: "Ondas do Mar",
-    description: "Som tranquilo do oceano",
-    youtubeId: "WHPEKLQID4U",
-    icon: "🌊",
-    quality: "12h 4K"
+    id: 'ocean',
+    name: 'Ondas do Mar',
+    description: 'Som tranquilo do oceano',
+    youtubeId: 'WHPEKLQID4U',
+    icon: '🌊',
+    quality: '12h 4K',
   },
   {
-    id: "wind",
-    name: "Vento Suave",
-    description: "Brisa relaxante",
-    youtubeId: "wzjWIxXBs_s",
-    icon: "💨",
-    quality: "10h 4K"
-  }
+    id: 'wind',
+    name: 'Vento Suave',
+    description: 'Brisa relaxante',
+    youtubeId: 'wzjWIxXBs_s',
+    icon: '💨',
+    quality: '10h 4K',
+  },
 ];
+
+const buildEmbedUrl = (videoId: string) => {
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&modestbranding=1&rel=0&playsinline=1`;
+};
 
 const MusicPlayer = () => {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -84,30 +87,9 @@ const MusicPlayer = () => {
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showLibrary, setShowLibrary] = useState(true);
-  
-  const { 
-    isAPIReady, 
-    isPlaying, 
-    containerRef, 
-    initializePlayer, 
-    play, 
-    pause, 
-    stop: stopPlayer,
-    setVolume: setPlayerVolume,
-    destroy 
-  } = useYouTubePlayer();
-
-  useEffect(() => {
-    return () => {
-      destroy();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying) {
-      setPlayerVolume(volume[0]);
-    }
-  }, [volume, isPlaying]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playerSrc, setPlayerSrc] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -120,7 +102,7 @@ const MusicPlayer = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('youtube-search', {
-        body: { query: searchQuery }
+        body: { query: searchQuery },
       });
 
       if (error) throw error;
@@ -142,25 +124,10 @@ const MusicPlayer = () => {
   };
 
   const playTrack = (track: Track) => {
-    console.log('Reproduzir track:', track.title, '- API Ready:', isAPIReady);
-
-    if (!isAPIReady) {
-      toast.error('Player carregando, toque novamente em 1 segundo');
-      return;
-    }
-
+    console.log('Reproduzir via iframe:', track.title);
     setCurrentTrack(track);
-
-    initializePlayer({
-      videoId: track.id,
-      volume: volume[0],
-      onReady: () => {
-        console.log('Música carregada com sucesso!');
-        toast.success(`🎵 ${track.title}`, {
-          description: `Por ${track.artist}`,
-        });
-      },
-    });
+    setPlayerSrc(buildEmbedUrl(track.id));
+    setIsPlaying(true);
   };
 
   const handleTrackSelect = (track: Track) => {
@@ -180,29 +147,44 @@ const MusicPlayer = () => {
     if (!currentTrack) return;
 
     if (isPlaying) {
-      pause();
+      // parar totalmente
+      setIsPlaying(false);
+      setPlayerSrc(null);
+      if (iframeRef.current) {
+        iframeRef.current.src = 'about:blank';
+      }
     } else {
-      play();
+      // voltar a tocar do início
+      playTrack(currentTrack);
     }
   };
 
   const handleStop = () => {
-    stopPlayer();
-    destroy();
+    setIsPlaying(false);
+    setPlayerSrc(null);
     setCurrentTrack(null);
+    if (iframeRef.current) {
+      iframeRef.current.src = 'about:blank';
+    }
     toast.success('⏹️ Reprodução parada');
   };
 
   const handleVolumeChange = (newVolume: number[]) => {
     setVolume(newVolume);
-    setPlayerVolume(newVolume[0]);
+    // Volume real controlado pelo dispositivo do usuário
   };
 
   return (
     <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-purple-950/90 via-pink-950/90 to-blue-950/90 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950">
-      {/* Container para o player do YouTube - DEVE ter ID */}
-      <div id={containerRef} style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} />
-      
+      {/* Player do YouTube em iframe oculto, mas ativo */}
+      <iframe
+        ref={iframeRef}
+        src={playerSrc || undefined}
+        title="Mamãe Zen Music Player"
+        style={{ position: 'absolute', width: '1px', height: '1px', top: '-9999px', left: '-9999px', border: '0' }}
+        allow="autoplay; encrypted-media"
+      />
+
       {/* Header - Estilo Spotify */}
       <div className="bg-gradient-to-b from-black/40 to-transparent p-6 pb-4">
         <div className="flex items-center gap-3 mb-4">
@@ -227,7 +209,7 @@ const MusicPlayer = () => {
               className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:bg-white/15 transition-all"
             />
           </div>
-          <Button 
+          <Button
             onClick={handleSearch}
             disabled={isSearching}
             className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white px-6"
@@ -239,7 +221,7 @@ const MusicPlayer = () => {
         {/* Toggle View */}
         <div className="flex gap-2 mt-3">
           <Button
-            variant={showLibrary ? "secondary" : "ghost"}
+            variant={showLibrary ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => setShowLibrary(true)}
             className="text-xs"
@@ -249,7 +231,7 @@ const MusicPlayer = () => {
           </Button>
           {searchResults.length > 0 && (
             <Button
-              variant={!showLibrary ? "secondary" : "ghost"}
+              variant={!showLibrary ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setShowLibrary(false)}
               className="text-xs"
@@ -275,8 +257,8 @@ const MusicPlayer = () => {
                     onClick={() => handleLibraryTrackSelect(sound)}
                     className={`
                       relative p-4 rounded-xl transition-all duration-300 text-left
-                      ${currentTrack?.id === sound.youtubeId 
-                        ? 'bg-gradient-to-br from-pink-600/40 to-purple-600/40 shadow-lg scale-[1.02]' 
+                      ${currentTrack?.id === sound.youtubeId
+                        ? 'bg-gradient-to-br from-pink-600/40 to-purple-600/40 shadow-lg scale-[1.02]'
                         : 'bg-white/5 hover:bg-white/10'
                       }
                     `}
@@ -284,12 +266,8 @@ const MusicPlayer = () => {
                     <div className="flex flex-col gap-2">
                       <span className="text-3xl">{sound.icon}</span>
                       <div>
-                        <p className="font-semibold text-white text-sm leading-tight">
-                          {sound.name}
-                        </p>
-                        <p className="text-xs text-white/50 mt-1">
-                          {sound.quality}
-                        </p>
+                        <p className="font-semibold text-white text-sm leading-tight">{sound.name}</p>
+                        <p className="text-xs text-white/50 mt-1">{sound.quality}</p>
                       </div>
                     </div>
                     {currentTrack?.id === sound.youtubeId && isPlaying && (
@@ -308,10 +286,8 @@ const MusicPlayer = () => {
           ) : (
             /* Resultados da Busca - Lista estilo Spotify */
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-white/80 mb-2">
-                Resultados para "{searchQuery}"
-              </h3>
-              {searchResults.map((track, index) => (
+              <h3 className="text-sm font-semibold text-white/80 mb-2">Resultados para "{searchQuery}"</h3>
+              {searchResults.map((track) => (
                 <button
                   key={track.id}
                   onClick={() => handleTrackSelect(track)}
@@ -331,17 +307,11 @@ const MusicPlayer = () => {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-white text-sm truncate">
-                      {track.title}
-                    </p>
-                    <p className="text-xs text-white/50 truncate">
-                      {track.artist}
-                    </p>
+                    <p className="font-semibold text-white text-sm truncate">{track.title}</p>
+                    <p className="text-xs text-white/50 truncate">{track.artist}</p>
                   </div>
                   {currentTrack?.id === track.id && isPlaying && (
-                    <Badge className="bg-green-500/20 text-green-400 text-xs">
-                      Tocando
-                    </Badge>
+                    <Badge className="bg-green-500/20 text-green-400 text-xs">Tocando</Badge>
                   )}
                 </button>
               ))}
@@ -358,12 +328,8 @@ const MusicPlayer = () => {
                   <Music className="w-6 h-6 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-white text-sm truncate">
-                    {currentTrack.title}
-                  </p>
-                  <p className="text-xs text-white/60 truncate">
-                    {currentTrack.artist}
-                  </p>
+                  <p className="font-semibold text-white text-sm truncate">{currentTrack.title}</p>
+                  <p className="text-xs text-white/60 truncate">{currentTrack.artist}</p>
                 </div>
               </div>
               <div className="flex gap-2 flex-shrink-0">
@@ -372,17 +338,10 @@ const MusicPlayer = () => {
                   onClick={handlePlayPauseClick}
                   className={`
                     h-10 w-10 rounded-full transition-all
-                    ${isPlaying 
-                      ? 'bg-white text-purple-900 hover:bg-white/90' 
-                      : 'bg-white/20 text-white hover:bg-white/30'
-                    }
+                    ${isPlaying ? 'bg-white text-purple-900 hover:bg-white/90' : 'bg-white/20 text-white hover:bg-white/30'}
                   `}
                 >
-                  {isPlaying ? (
-                    <Pause className="w-4 h-4" />
-                  ) : (
-                    <Play className="w-4 h-4 ml-0.5" />
-                  )}
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </Button>
                 <Button
                   size="icon"
@@ -405,9 +364,7 @@ const MusicPlayer = () => {
                 step={1}
                 className="flex-1"
               />
-              <span className="text-xs text-white/60 w-10 text-right flex-shrink-0">
-                {volume[0]}%
-              </span>
+              <span className="text-xs text-white/60 w-10 text-right flex-shrink-0">{volume[0]}%</span>
             </div>
           </div>
         )}
