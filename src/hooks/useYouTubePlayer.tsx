@@ -39,7 +39,12 @@ export const useYouTubePlayer = () => {
   }, []);
 
   const initializePlayer = (options: UseYouTubePlayerOptions) => {
-    if (!isAPIReady || !window.YT) return;
+    console.log('initializePlayer chamado:', { isAPIReady, hasYT: !!window.YT, videoId: options.videoId });
+    
+    if (!isAPIReady || !window.YT) {
+      console.warn('API não está pronta ainda');
+      return;
+    }
 
     // Destroi player anterior se existir
     if (playerRef.current) {
@@ -50,6 +55,14 @@ export const useYouTubePlayer = () => {
       }
     }
 
+    // Verifica se o container existe
+    const container = document.getElementById(containerRef.current);
+    if (!container) {
+      console.error('Container não encontrado:', containerRef.current);
+      return;
+    }
+
+    console.log('Criando player do YouTube...');
     const newPlayer = new window.YT.Player(containerRef.current, {
       height: '0',
       width: '0',
@@ -69,6 +82,7 @@ export const useYouTubePlayer = () => {
       },
       events: {
         onReady: (event: any) => {
+          console.log('Player pronto!');
           event.target.setVolume(options.volume || 70);
           event.target.playVideo();
           options.onReady?.();
@@ -76,8 +90,12 @@ export const useYouTubePlayer = () => {
         },
         onStateChange: (event: any) => {
           const state = event.data;
+          console.log('Estado do player mudou:', state);
           setIsPlaying(state === window.YT.PlayerState.PLAYING);
           options.onStateChange?.(state);
+        },
+        onError: (event: any) => {
+          console.error('Erro no player do YouTube:', event.data);
         },
       },
     });

@@ -142,6 +142,8 @@ const MusicPlayer = () => {
   };
 
   const handleTrackSelect = (track: Track) => {
+    console.log('Track selecionado:', track.title, '- API Ready:', isAPIReady);
+    
     if (currentTrack?.id === track.id) {
       if (isPlaying) {
         pause();
@@ -151,17 +153,27 @@ const MusicPlayer = () => {
     } else {
       setCurrentTrack(track);
       
-      setTimeout(() => {
+      // Aguarda um pouco para garantir que a API está pronta
+      const tryInitialize = () => {
+        if (!isAPIReady) {
+          console.log('Aguardando API do YouTube ficar pronta...');
+          setTimeout(tryInitialize, 500);
+          return;
+        }
+        
         initializePlayer({
           videoId: track.id,
           volume: volume[0],
           onReady: () => {
+            console.log('Música carregada com sucesso!');
             toast.success(`🎵 ${track.title}`, {
               description: `Por ${track.artist}`,
             });
           },
         });
-      }, 100);
+      };
+      
+      setTimeout(tryInitialize, 100);
     }
   };
 
@@ -188,7 +200,8 @@ const MusicPlayer = () => {
 
   return (
     <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-purple-950/90 via-pink-950/90 to-blue-950/90 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950">
-      <div id={containerRef} style={{ display: 'none' }} />
+      {/* Container para o player do YouTube - DEVE ter ID */}
+      <div id={containerRef} style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} />
       
       {/* Header - Estilo Spotify */}
       <div className="bg-gradient-to-b from-black/40 to-transparent p-6 pb-4">
