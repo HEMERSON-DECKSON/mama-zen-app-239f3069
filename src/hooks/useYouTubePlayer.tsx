@@ -84,6 +84,14 @@ export const useYouTubePlayer = () => {
       events: {
         onReady: (event: any) => {
           console.log('Player pronto!');
+          try {
+            if (event.target.isMuted && event.target.isMuted()) {
+              console.log('Desmutando player do YouTube...');
+              event.target.unMute();
+            }
+          } catch (e) {
+            console.warn('Não foi possível checar estado de mute:', e);
+          }
           event.target.setVolume(options.volume || 70);
           event.target.playVideo();
           options.onReady?.();
