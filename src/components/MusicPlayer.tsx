@@ -141,34 +141,30 @@ const MusicPlayer = () => {
     }
   };
 
-  const handleTrackSelect = (track: Track) => {
-    console.log('Track selecionado:', track.title, '- API Ready:', isAPIReady);
-    
-    if (currentTrack?.id === track.id) {
-      if (isPlaying) {
-        pause();
-      } else {
-        play();
-      }
-    } else {
-      if (!isAPIReady) {
-        toast.error('Player carregando, tente novamente em 1 segundo');
-        return;
-      }
+  const playTrack = (track: Track) => {
+    console.log('Reproduzir track:', track.title, '- API Ready:', isAPIReady);
 
-      setCurrentTrack(track);
-      
-      initializePlayer({
-        videoId: track.id,
-        volume: volume[0],
-        onReady: () => {
-          console.log('Música carregada com sucesso!');
-          toast.success(`🎵 ${track.title}`, {
-            description: `Por ${track.artist}`,
-          });
-        },
-      });
+    if (!isAPIReady) {
+      toast.error('Player carregando, toque novamente em 1 segundo');
+      return;
     }
+
+    setCurrentTrack(track);
+
+    initializePlayer({
+      videoId: track.id,
+      volume: volume[0],
+      onReady: () => {
+        console.log('Música carregada com sucesso!');
+        toast.success(`🎵 ${track.title}`, {
+          description: `Por ${track.artist}`,
+        });
+      },
+    });
+  };
+
+  const handleTrackSelect = (track: Track) => {
+    playTrack(track);
   };
 
   const handleLibraryTrackSelect = (sound: Sound) => {
@@ -177,7 +173,17 @@ const MusicPlayer = () => {
       title: sound.name,
       artist: sound.description,
     };
-    handleTrackSelect(track);
+    playTrack(track);
+  };
+
+  const handlePlayPauseClick = () => {
+    if (!currentTrack) return;
+
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
   };
 
   const handleStop = () => {
@@ -363,7 +369,7 @@ const MusicPlayer = () => {
               <div className="flex gap-2 flex-shrink-0">
                 <Button
                   size="icon"
-                  onClick={() => handleTrackSelect(currentTrack)}
+                  onClick={handlePlayPauseClick}
                   className={`
                     h-10 w-10 rounded-full transition-all
                     ${isPlaying 
