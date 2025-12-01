@@ -104,9 +104,15 @@ export default function BabySounds() {
     } else {
       // Troca de som
       setCurrentSound(sound);
-      
-      // Pequeno delay para garantir que o DOM está pronto
-      setTimeout(() => {
+
+      // Aguarda a API do YouTube ficar pronta antes de iniciar
+      const tryInitialize = () => {
+        if (!isAPIReady) {
+          console.log('Aguardando API do YouTube (BabySounds)...');
+          setTimeout(tryInitialize, 300);
+          return;
+        }
+
         initializePlayer({
           videoId: sound.youtubeId,
           volume: volume[0],
@@ -117,7 +123,10 @@ export default function BabySounds() {
             });
           },
         });
-      }, 100);
+      };
+
+      // Pequeno delay para garantir que o DOM está pronto
+      setTimeout(tryInitialize, 100);
     }
   };
 
@@ -148,8 +157,11 @@ export default function BabySounds() {
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
-        {/* Container invisível para o player do YouTube */}
-        <div id={containerRef} style={{ display: 'none' }} />
+        {/* Container invisível para o player do YouTube (fora da tela, mas ativo) */}
+        <div
+          id={containerRef}
+          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+        />
 
         <div className="grid grid-cols-3 gap-2 mb-4">
           {babySounds.map((sound) => (
