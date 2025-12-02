@@ -156,7 +156,15 @@ export default function BabySounds() {
         {/* Container invisível para o player do YouTube (fora da tela, mas ativo) */}
         <div
           id={containerRef}
-          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            pointerEvents: 'none',
+          }}
         />
 
         <div className="grid grid-cols-3 gap-2 mb-4">

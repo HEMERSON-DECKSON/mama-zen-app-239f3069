@@ -181,7 +181,16 @@ const MusicPlayer = () => {
         ref={iframeRef}
         src={playerSrc || undefined}
         title="Mamãe Zen Music Player"
-        style={{ position: 'absolute', width: '1px', height: '1px', top: '-9999px', left: '-9999px', border: '0' }}
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '1px',
+          height: '1px',
+          border: '0',
+          opacity: 0,
+          pointerEvents: 'none',
+        }}
         allow="autoplay; encrypted-media; playsinline"
       />
 
