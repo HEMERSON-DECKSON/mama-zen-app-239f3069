@@ -19,8 +19,9 @@ import EmergencyMap from '@/components/EmergencyMap';
 import PharmacyMap from '@/components/PharmacyMap';
 import NotificationCenter from '@/components/NotificationCenter';
 import AntiInspect from '@/components/AntiInspect';
+import { PregnancyTracker } from '@/components/PregnancyTracker';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross, Bell } from 'lucide-react';
+import { Baby, Music, Calendar, BookOpen, Moon, Milk, Sparkles, Pill, Brain, MapPin, Instagram, ShoppingBag, Cross, Bell, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -281,12 +282,17 @@ const Index = () => {
                       <BookOpen className="w-4 h-4" />
                       <span>{isUSA ? 'E-book' : 'E-book'}</span>
                     </TabsTrigger>
+                    <TabsTrigger value="pregnancy" className="flex-col gap-1 py-2 text-xs">
+                      <Heart className="w-4 h-4" />
+                      <span>{isUSA ? 'Pregnancy' : 'Gravidez'}</span>
+                    </TabsTrigger>
                   </TabsList>
                   <TabsContent value="sleep" className="mt-2"><SleepTracker /></TabsContent>
                   <TabsContent value="feeding" className="mt-2"><FeedingTracker /></TabsContent>
                   <TabsContent value="autism" className="mt-2"><AutismGuide /></TabsContent>
                   <TabsContent value="routine" className="mt-2"><RoutineCalendar /></TabsContent>
                   <TabsContent value="ebook" className="mt-2"><GuideLibrary /></TabsContent>
+                  <TabsContent value="pregnancy" className="mt-2"><PregnancyTracker /></TabsContent>
                 </div>
               </details>
             </div>
