@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
 
 interface Track {
   id: string;
@@ -76,10 +77,6 @@ const sleepTracks: Sound[] = [
   },
 ];
 
-const buildEmbedUrl = (videoId: string) => {
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`;
-};
-
 const MusicPlayer = () => {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [volume, setVolume] = useState([70]);
@@ -87,9 +84,16 @@ const MusicPlayer = () => {
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showLibrary, setShowLibrary] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playerSrc, setPlayerSrc] = useState<string | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  
+  const { 
+    isAPIReady, 
+    isPlaying, 
+    containerRef, 
+    initializePlayer, 
+    pause, 
+    destroy,
+    setVolume: setPlayerVolume 
+  } = useYouTubePlayer();
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -124,10 +128,18 @@ const MusicPlayer = () => {
   };
 
   const playTrack = (track: Track) => {
-    console.log('Reproduzir via iframe:', track.title);
+    console.log('Tocar música:', track.title);
     setCurrentTrack(track);
-    setPlayerSrc(buildEmbedUrl(track.id));
-    setIsPlaying(true);
+    
+    if (isAPIReady) {
+      initializePlayer({
+        videoId: track.id,
+        volume: volume[0],
+        onReady: () => {
+          toast.success(`🎵 Tocando: ${track.title}`);
+        },
+      });
+    }
   };
 
   const handleTrackSelect = (track: Track) => {
@@ -147,51 +159,37 @@ const MusicPlayer = () => {
     if (!currentTrack) return;
 
     if (isPlaying) {
-      // parar totalmente
-      setIsPlaying(false);
-      setPlayerSrc(null);
-      if (iframeRef.current) {
-        iframeRef.current.src = 'about:blank';
-      }
+      pause();
     } else {
-      // voltar a tocar do início
       playTrack(currentTrack);
     }
   };
 
   const handleStop = () => {
-    setIsPlaying(false);
-    setPlayerSrc(null);
+    destroy();
     setCurrentTrack(null);
-    if (iframeRef.current) {
-      iframeRef.current.src = 'about:blank';
-    }
     toast.success('⏹️ Reprodução parada');
   };
 
   const handleVolumeChange = (newVolume: number[]) => {
     setVolume(newVolume);
-    // Volume real controlado pelo dispositivo do usuário
+    setPlayerVolume(newVolume[0]);
   };
 
   return (
     <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-purple-950/90 via-pink-950/90 to-blue-950/90 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950">
-      {/* Player do YouTube em iframe oculto, mas ativo */}
-      <iframe
-        ref={iframeRef}
-        src={playerSrc || undefined}
-        title="Mamãe Zen Music Player"
+      {/* Container do YouTube Player (invisível mas ativo) */}
+      <div
+        id={containerRef}
         style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
           width: '1px',
           height: '1px',
-          border: '0',
           opacity: 0,
           pointerEvents: 'none',
         }}
-        allow="autoplay; encrypted-media; playsinline"
       />
 
       {/* Header - Estilo Spotify */}
