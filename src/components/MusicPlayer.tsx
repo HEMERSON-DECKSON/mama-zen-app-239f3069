@@ -77,7 +77,7 @@ const sleepTracks: Sound[] = [
 ];
 
 const buildEmbedUrl = (videoId: string) => {
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&modestbranding=1&rel=0&playsinline=1`;
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`;
 };
 
 const MusicPlayer = () => {
@@ -182,7 +182,7 @@ const MusicPlayer = () => {
         src={playerSrc || undefined}
         title="Mamãe Zen Music Player"
         style={{ position: 'absolute', width: '1px', height: '1px', top: '-9999px', left: '-9999px', border: '0' }}
-        allow="autoplay; encrypted-media"
+        allow="autoplay; encrypted-media; playsinline"
       />
 
       {/* Header - Estilo Spotify */}
@@ -244,13 +244,13 @@ const MusicPlayer = () => {
       </div>
 
       {/* Content Area */}
-      <div className="p-6 pt-2">
-        <ScrollArea className="h-[400px] pr-4">
+      <div className="p-4 pt-2">
+        <ScrollArea className="h-[400px] pr-2">
           {showLibrary ? (
             /* Biblioteca - Grid de cards premium */
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-white/80 mb-2">Sons Relaxantes</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 {sleepTracks.map((sound) => (
                   <button
                     key={sound.id}
