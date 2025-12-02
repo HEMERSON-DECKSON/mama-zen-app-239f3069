@@ -68,7 +68,7 @@ export const useYouTubePlayer = () => {
       width: '1',
       videoId: options.videoId,
       playerVars: {
-        autoplay: 1,
+        autoplay: 0, // Não usar autoplay - iOS bloqueia áudio
         controls: 0,
         disablekb: 1,
         fs: 0,
@@ -78,24 +78,23 @@ export const useYouTubePlayer = () => {
         showinfo: 0,
         iv_load_policy: 3,
         loop: 1,
-        playlist: options.videoId, // necessário para loop funcionar
+        playlist: options.videoId,
         origin: window.location.origin,
       },
       events: {
         onReady: (event: any) => {
           console.log('Player pronto!');
-          try {
-            if (event.target.isMuted && event.target.isMuted()) {
-              console.log('Desmutando player do YouTube...');
-              event.target.unMute();
-            }
-          } catch (e) {
-            console.warn('Não foi possível checar estado de mute:', e);
+          // Garantir que não está mutado
+          if (event.target.isMuted && event.target.isMuted()) {
+            event.target.unMute();
           }
           event.target.setVolume(options.volume || 70);
-          event.target.playVideo();
           options.onReady?.();
-          setIsPlaying(true);
+          // Tocar imediatamente após ready (iniciado por clique do usuário)
+          setTimeout(() => {
+            event.target.playVideo();
+            setIsPlaying(true);
+          }, 100);
         },
         onStateChange: (event: any) => {
           const state = event.data;
