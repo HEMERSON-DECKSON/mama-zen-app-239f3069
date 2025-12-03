@@ -1,18 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Navigation, Hospital, Stethoscope, Loader2, Building2 } from "lucide-react";
+import { MapPin, Phone, Navigation, Hospital, Stethoscope, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useCountry } from "@/contexts/CountryContext";
-
-interface IPLocationData {
-  city: string;
-  region: string;
-  country: string;
-  latitude: number;
-  longitude: number;
-}
 
 interface Location {
   lat: number;
@@ -35,10 +27,10 @@ const EmergencyMap = () => {
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(false);
   const [nearbyPlaces, setNearbyPlaces] = useState<Emergency[]>([]);
-  const [ipLocation, setIpLocation] = useState<IPLocationData | null>(null);
+  const [locationCity, setLocationCity] = useState<string>("");
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Raio da Terra em km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -49,27 +41,24 @@ const EmergencyMap = () => {
     return R * c;
   };
 
-  const getIPLocation = async () => {
+  const reverseGeocode = async (lat: number, lng: number): Promise<{ city: string; region: string }> => {
     try {
-      const response = await fetch('https://ipapi.co/json/');
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`
+      );
       const data = await response.json();
-      return {
-        city: data.city,
-        region: data.region,
-        country: data.country_name,
-        latitude: data.latitude,
-        longitude: data.longitude
-      };
+      const city = data.address?.city || data.address?.town || data.address?.municipality || data.address?.village || "";
+      const region = data.address?.state || data.address?.region || "";
+      return { city, region };
     } catch (error) {
-      console.error("Erro ao obter localização por IP:", error);
-      return null;
+      console.error("Erro ao obter cidade:", error);
+      return { city: "", region: "" };
     }
   };
 
   const searchNearbyHospitals = async (lat: number, lng: number, city: string, region: string) => {
     try {
-      // Usando Overpass API para buscar TODAS unidades de saúde próximas - GRATUITO!
-      const radius = 10000; // 10km de raio
+      const radius = 10000;
       const query = `
         [out:json][timeout:25];
         (
@@ -103,7 +92,6 @@ const EmergencyMap = () => {
         const elementLng = element.lon || element.center?.lon;
         const distance = calculateDistance(lat, lng, elementLat, elementLng);
         
-        // Determinar tipo baseado nas tags
         let type: Emergency["type"] = "hospital";
         if (element.tags?.amenity === "clinic" || element.tags?.healthcare === "clinic") {
           type = "clinica";
@@ -114,9 +102,9 @@ const EmergencyMap = () => {
         }
         
         return {
-          name: element.tags?.name || element.tags?.["name:en"] || "Unidade sem nome",
+          name: element.tags?.name || element.tags?.["name:en"] || (isUSA ? "Unnamed facility" : "Unidade sem nome"),
           type,
-          phone: element.tags?.phone || element.tags?.["contact:phone"] || "Não disponível",
+          phone: element.tags?.phone || element.tags?.["contact:phone"] || (isUSA ? "Not available" : "Não disponível"),
           address: `${element.tags?.["addr:street"] || ""} ${element.tags?.["addr:housenumber"] || ""}, ${city} - ${region}`.trim(),
           lat: elementLat,
           lng: elementLng,
@@ -127,72 +115,99 @@ const EmergencyMap = () => {
                    element.tags?.operator?.toLowerCase().includes("ubs") ||
                    element.tags?.name?.toLowerCase().includes("ubs")
         };
-      }).filter((h: Emergency) => h.name !== "Unidade sem nome" && h.lat && h.lng);
+      }).filter((h: Emergency) => h.name !== "Unidade sem nome" && h.name !== "Unnamed facility" && h.lat && h.lng);
 
       return healthUnits.sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 15);
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error("Erro ao buscar unidades de saúde:", error);
       }
-      toast.error("Erro ao buscar unidades próximas");
+      toast.error(isUSA ? "Error searching nearby facilities" : "Erro ao buscar unidades próximas");
       return [];
     }
   };
 
   const getLocation = async () => {
     setLoading(true);
-    toast.info("🔍 Buscando hospitais da sua região...");
+    toast.info(isUSA ? "🔍 Searching hospitals in your area..." : "🔍 Buscando hospitais da sua região...");
     
-    try {
-      // Primeiro, obter localização por IP
-      const ipData = await getIPLocation();
-      
-      if (!ipData) {
-        toast.error("Não foi possível obter sua localização por IP");
-        setLoading(false);
-        return;
-      }
-      
-      setIpLocation(ipData);
-      
-      const location = {
-        lat: ipData.latitude,
-        lng: ipData.longitude
-      };
-      setUserLocation(location);
-      
-      // Buscar hospitais próximos baseado na localização do IP
-      toast.info(`📍 Localização: ${ipData.city} - ${ipData.region}`);
-      const hospitals = await searchNearbyHospitals(
-        ipData.latitude, 
-        ipData.longitude,
-        ipData.city,
-        ipData.region
-      );
-      
-      if (hospitals.length > 0) {
-        setNearbyPlaces(hospitals);
-        toast.success(`✅ Encontradas ${hospitals.length} unidades de saúde em ${ipData.city}!`);
-      } else {
-        toast.warning("Nenhuma unidade encontrada próxima. Tente novamente.");
-      }
-      
-    } catch (error) {
-      console.error("Erro:", error);
-      toast.error("Erro ao buscar hospitais. Tente novamente.");
-    } finally {
+    if (!navigator.geolocation) {
+      toast.error(isUSA ? "Geolocation is not supported by your browser" : "Geolocalização não é suportada pelo seu navegador");
       setLoading(false);
+      return;
     }
-  };
 
-  useEffect(() => {
-    // Buscar localização automaticamente ao carregar
-    getIPLocation().then(data => {
-      if (data) {
-        setIpLocation(data);
+    const timeoutId = setTimeout(() => {
+      toast.error(isUSA ? "Location request timed out. Please try again." : "Tempo esgotado. Tente novamente.");
+      setLoading(false);
+    }, 15000);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        clearTimeout(timeoutId);
+        try {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setUserLocation(location);
+          
+          // Obter nome da cidade via reverse geocoding
+          const { city, region } = await reverseGeocode(location.lat, location.lng);
+          const locationName = city && region ? `${city} - ${region}` : (city || region || (isUSA ? "Your location" : "Sua localização"));
+          setLocationCity(locationName);
+          
+          toast.info(`📍 ${isUSA ? "Location" : "Localização"}: ${locationName}`);
+          
+          const hospitals = await searchNearbyHospitals(
+            location.lat, 
+            location.lng,
+            city,
+            region
+          );
+          
+          if (hospitals.length > 0) {
+            setNearbyPlaces(hospitals);
+            toast.success(isUSA 
+              ? `✅ Found ${hospitals.length} health facilities nearby!`
+              : `✅ Encontradas ${hospitals.length} unidades de saúde!`
+            );
+          } else {
+            toast.warning(isUSA 
+              ? "No facilities found nearby. Try again."
+              : "Nenhuma unidade encontrada próxima. Tente novamente."
+            );
+          }
+        } catch (error) {
+          console.error("Erro:", error);
+          toast.error(isUSA ? "Error searching hospitals. Try again." : "Erro ao buscar hospitais. Tente novamente.");
+        } finally {
+          setLoading(false);
+        }
+      },
+      (error) => {
+        clearTimeout(timeoutId);
+        console.error('Error getting location:', error);
+        let message = isUSA 
+          ? "Could not get your location. Please enable GPS."
+          : "Não foi possível obter sua localização. Ative o GPS.";
+        
+        if (error.code === error.PERMISSION_DENIED) {
+          message = isUSA 
+            ? "Location permission denied. Please enable in settings."
+            : "Permissão de localização negada. Ative nas configurações.";
+        }
+        
+        toast.error(message);
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
       }
-    });
-  }, []);
+    );
+  };
 
   const openInMaps = (place: Emergency) => {
     if (!place.lat || !place.lng) {
@@ -206,20 +221,16 @@ const EmergencyMap = () => {
     const isAndroid = /Android/i.test(navigator.userAgent);
     
     if (isIOS) {
-      // iOS: usar URL universal do Google Maps que funciona tanto no app quanto no browser
       const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`;
       window.open(mapsUrl, '_blank');
     } else if (isAndroid) {
-      // Android: tentar abrir no app do Google Maps primeiro
       const intentUrl = `google.navigation:q=${place.lat},${place.lng}`;
       window.location.href = intentUrl;
-      // Fallback para browser após 1 segundo
       setTimeout(() => {
         const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`;
         window.open(mapsUrl, '_blank');
       }, 1000);
     } else {
-      // Desktop: abrir direto no browser com rotas
       const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
       window.open(mapsUrl, '_blank');
     }
@@ -243,20 +254,18 @@ const EmergencyMap = () => {
   const getTypeBadge = (place: Emergency) => {
     const badges = [];
     
-    // Badge de tipo
     if (place.type === "hospital") {
       badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-red-500">Hospital</Badge>);
     } else if (place.type === "pronto-socorro") {
-      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-orange-500">Pronto-Socorro</Badge>);
+      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-orange-500">{isUSA ? "ER" : "Pronto-Socorro"}</Badge>);
     } else {
-      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-blue-500">Clínica</Badge>);
+      badges.push(<Badge key="type" className="text-[10px] px-1.5 py-0 bg-blue-500">{isUSA ? "Clinic" : "Clínica"}</Badge>);
     }
     
-    // Badge de público/particular
     if (place.isPublic !== undefined) {
       badges.push(
         <Badge key="funding" variant="outline" className="text-[10px] px-1.5 py-0">
-          {place.isPublic ? "🏥 Público" : "💼 Particular"}
+          {place.isPublic ? (isUSA ? "🏥 Public" : "🏥 Público") : (isUSA ? "💼 Private" : "💼 Particular")}
         </Badge>
       );
     }
@@ -270,13 +279,15 @@ const EmergencyMap = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Hospital className="w-5 h-5 text-red-600 dark:text-red-400" />
-            <CardTitle className="text-lg text-red-700 dark:text-red-400">Todas as unidades de saúde próximas</CardTitle>
+            <CardTitle className="text-lg text-red-700 dark:text-red-400">
+              {isUSA ? "All nearby health facilities" : "Todas as unidades de saúde próximas"}
+            </CardTitle>
           </div>
           <CardDescription className="text-xs leading-relaxed">
-            {ipLocation ? (
-              <>📍 Sua região: <strong>{ipLocation.city} - {ipLocation.region}</strong></>
+            {locationCity ? (
+              <>📍 {isUSA ? "Your location" : "Sua região"}: <strong>{locationCity}</strong></>
             ) : (
-              <>Hospitais, clínicas, UBS e pronto-socorros em um só lugar</>
+              <>{isUSA ? "Hospitals, clinics, and emergency rooms in one place" : "Hospitais, clínicas, UBS e pronto-socorros em um só lugar"}</>
             )}
           </CardDescription>
         </CardHeader>
@@ -290,20 +301,29 @@ const EmergencyMap = () => {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Buscando unidades próximas...
+                {isUSA ? "Searching nearby facilities..." : "Buscando unidades próximas..."}
               </>
             ) : userLocation ? (
               <>
                 <Navigation className="w-4 h-4" />
-                🚨 Atualizar localização
+                🚨 {isUSA ? "Update location" : "Atualizar localização"}
               </>
             ) : (
               <>
                 <Hospital className="w-4 h-4" />
-                🚨 Emergência - Ativar busca
+                🚨 {isUSA ? "Emergency - Activate search" : "Emergência - Ativar busca"}
               </>
             )}
           </Button>
+          
+          {userLocation && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-green-600 dark:text-green-400">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-xs font-medium">
+                {isUSA ? "GPS Active" : "GPS Ativo"}
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -383,11 +403,7 @@ const EmergencyMap = () => {
         {nearbyPlaces.length > 0 && (
           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
             <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">
-              {userLocation && ipLocation ? (
-                <>📍 {nearbyPlaces.length} unidades encontradas em {ipLocation.city} - {ipLocation.region}</>
-              ) : (
-                <>🏥 Clique no botão acima para encontrar todas unidades de saúde próximas</>
-              )}
+              📍 {nearbyPlaces.length} {isUSA ? "facilities found" : "unidades encontradas"} {locationCity && `- ${locationCity}`}
             </h3>
           </div>
         )}
@@ -422,7 +438,7 @@ const EmergencyMap = () => {
                     className="w-full"
                   >
                     <Navigation className="w-3 h-3" />
-                    Rotas
+                    {isUSA ? "Directions" : "Rotas"}
                   </Button>
                 </div>
               </div>
@@ -434,8 +450,9 @@ const EmergencyMap = () => {
       <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
         <CardContent className="p-3">
           <p className="text-xs text-center leading-relaxed">
-            <strong>💡 Dica:</strong> Salve os números de emergência na agenda do seu celular. 
-            Em situações de emergência com bebês, cada segundo conta! 🚨
+            <strong>💡 {isUSA ? "Tip" : "Dica"}:</strong> {isUSA 
+              ? "Save emergency numbers in your phone contacts. In emergencies with babies, every second counts! 🚨"
+              : "Salve os números de emergência na agenda do seu celular. Em situações de emergência com bebês, cada segundo conta! 🚨"}
           </p>
         </CardContent>
       </Card>
