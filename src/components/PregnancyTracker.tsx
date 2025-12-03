@@ -225,9 +225,9 @@ const fetalDevelopmentData: Record<number, {
 };
 
 const trimesterInfo = [
-  { name: "1º Trimestre", weeks: "1-12", color: "from-pink-400 to-pink-600" },
-  { name: "2º Trimestre", weeks: "13-26", color: "from-purple-400 to-purple-600" },
-  { name: "3º Trimestre", weeks: "27-40", color: "from-indigo-400 to-indigo-600" }
+  { name: "1º Trimestre", weeks: "1-12", color: "from-pink-500 to-pink-600" },
+  { name: "2º Trimestre", weeks: "13-26", color: "from-purple-500 to-purple-600" },
+  { name: "3º Trimestre", weeks: "27-40", color: "from-indigo-500 to-indigo-600" }
 ];
 
 export const PregnancyTracker = () => {
@@ -263,7 +263,7 @@ export const PregnancyTracker = () => {
   const calculateDueDate = (lmpDate: string): Date => {
     const lmp = new Date(lmpDate);
     const dueDate = new Date(lmp);
-    dueDate.setDate(dueDate.getDate() + 280); // 40 semanas
+    dueDate.setDate(dueDate.getDate() + 280);
     return dueDate;
   };
 
@@ -322,20 +322,17 @@ export const PregnancyTracker = () => {
   const weekData = getWeekData(currentWeek);
   const trimester = getTrimester(currentWeek);
 
-  // Gráfico de crescimento simplificado
   const GrowthChart = () => {
     const weeks = [8, 12, 16, 20, 24, 28, 32, 36, 40];
-    const maxHeight = 150;
     
     return (
-      <Card className="p-4 bg-white/10 backdrop-blur-sm border-white/20">
+      <Card className="p-4 bg-gradient-to-br from-purple-900/80 to-indigo-900/80 border-purple-500/30">
         <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5" />
+          <TrendingUp className="w-5 h-5 text-pink-400" />
           {isPT ? 'Gráfico de Crescimento' : 'Growth Chart'}
         </h3>
         <div className="flex items-end justify-between gap-1 h-40">
           {weeks.map((week) => {
-            const data = fetalDevelopmentData[week];
             const heightPercent = (week / 40) * 100;
             const isCurrentWeek = week === Math.round(currentWeek / 4) * 4;
             
@@ -345,16 +342,16 @@ export const PregnancyTracker = () => {
                   className={`w-full rounded-t-lg transition-all ${
                     isCurrentWeek 
                       ? 'bg-gradient-to-t from-pink-500 to-pink-300 shadow-lg shadow-pink-500/50' 
-                      : 'bg-gradient-to-t from-purple-500/60 to-purple-300/60'
+                      : 'bg-gradient-to-t from-purple-500 to-purple-300'
                   }`}
                   style={{ height: `${heightPercent}%` }}
                 />
-                <span className="text-xs text-white/70 mt-1">{week}</span>
+                <span className="text-xs text-pink-200 mt-1 font-medium">{week}</span>
               </div>
             );
           })}
         </div>
-        <p className="text-center text-white/60 text-xs mt-2">
+        <p className="text-center text-pink-200/70 text-xs mt-2">
           {isPT ? 'Semanas de gestação' : 'Weeks of pregnancy'}
         </p>
       </Card>
@@ -364,15 +361,15 @@ export const PregnancyTracker = () => {
   if (showSetup) {
     return (
       <div className="space-y-4">
-        <Card className="p-6 bg-gradient-to-br from-pink-500/20 to-purple-500/20 backdrop-blur-sm border-white/20">
+        <Card className="p-6 bg-gradient-to-br from-purple-900/80 via-pink-900/60 to-indigo-900/80 border-pink-500/30">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center shadow-lg shadow-pink-500/30">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/40">
               <Baby className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">
               {isPT ? 'Acompanhe sua Gravidez' : 'Track Your Pregnancy'}
             </h2>
-            <p className="text-white/70 text-sm">
+            <p className="text-pink-200/80 text-sm">
               {isPT 
                 ? 'Veja o desenvolvimento do seu bebê semana a semana'
                 : 'See your baby\'s development week by week'}
@@ -381,7 +378,7 @@ export const PregnancyTracker = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-white text-sm font-medium mb-2">
+              <label className="block text-pink-200 text-sm font-medium mb-2">
                 {isPT 
                   ? 'Data do primeiro dia da última menstruação'
                   : 'First day of your last period'}
@@ -390,12 +387,12 @@ export const PregnancyTracker = () => {
                 type="date"
                 value={lastPeriodDate}
                 onChange={(e) => setLastPeriodDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className="w-full px-4 py-3 rounded-xl bg-purple-900/50 border border-pink-500/30 text-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
 
             <div>
-              <label className="block text-white text-sm font-medium mb-2">
+              <label className="block text-pink-200 text-sm font-medium mb-2">
                 {isPT 
                   ? 'Duração do ciclo menstrual (dias)'
                   : 'Length of menstrual cycle (days)'}
@@ -406,14 +403,14 @@ export const PregnancyTracker = () => {
                 onChange={(e) => setCycleLength(Number(e.target.value))}
                 min={21}
                 max={35}
-                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className="w-full px-4 py-3 rounded-xl bg-purple-900/50 border border-pink-500/30 text-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
 
             <Button
               onClick={handleSubmit}
               disabled={!lastPeriodDate}
-              className="w-full py-6 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/30 transition-all"
+              className="w-full py-6 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/40 transition-all"
             >
               <Calendar className="w-5 h-5 mr-2" />
               {isPT ? 'Calcular' : 'Calculate'}
@@ -428,10 +425,10 @@ export const PregnancyTracker = () => {
     <ScrollArea className="h-[calc(100vh-200px)]">
       <div className="space-y-4 pb-4">
         {/* Header com informações principais */}
-        <Card className="p-4 bg-gradient-to-br from-pink-500/20 to-purple-500/20 backdrop-blur-sm border-white/20">
+        <Card className="p-4 bg-gradient-to-br from-purple-900/80 via-pink-900/60 to-indigo-900/80 border-pink-500/30">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-white/70 text-xs">
+              <p className="text-pink-300 text-xs font-medium">
                 {isPT ? 'Data prevista do parto' : 'Estimated due date'}
               </p>
               <p className="text-white font-bold text-lg">
@@ -439,7 +436,7 @@ export const PregnancyTracker = () => {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-white/70 text-xs">
+              <p className="text-pink-300 text-xs font-medium">
                 {isPT ? 'Faltam' : 'Days to go'}
               </p>
               <p className="text-white font-bold text-lg">
@@ -455,12 +452,12 @@ export const PregnancyTracker = () => {
                 key={index}
                 className={`flex-1 py-2 px-3 rounded-lg text-center transition-all ${
                   trimester === index + 1 
-                    ? `bg-gradient-to-r ${tri.color} shadow-lg` 
-                    : 'bg-white/10'
+                    ? `bg-gradient-to-r ${tri.color} shadow-lg shadow-pink-500/30` 
+                    : 'bg-purple-800/50 border border-purple-500/20'
                 }`}
               >
-                <p className="text-white text-xs font-medium">{tri.name}</p>
-                <p className="text-white/70 text-xs">{tri.weeks}</p>
+                <p className="text-white text-xs font-bold">{tri.name}</p>
+                <p className="text-pink-200/80 text-xs">{tri.weeks}</p>
               </div>
             ))}
           </div>
@@ -468,19 +465,19 @@ export const PregnancyTracker = () => {
           <Button
             variant="outline"
             onClick={handleReset}
-            className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+            className="w-full bg-purple-800/50 border-pink-500/30 text-pink-200 hover:bg-purple-700/50 hover:text-white"
           >
             {isPT ? 'Recalcular' : 'Recalculate'}
           </Button>
         </Card>
 
         {/* Ilustração 3D do bebê */}
-        <Card className="p-4 border-2 border-purple-500/30 shadow-xl shadow-purple-500/10" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #831843 100%)' }}>
+        <Card className="p-4 border-2 border-purple-500/30 shadow-xl shadow-purple-500/20" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #831843 100%)' }}>
           <Suspense fallback={
             <div className="w-full h-72 flex items-center justify-center rounded-2xl" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #831843 100%)' }}>
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
-                <span className="text-white/70 text-sm">Carregando 3D...</span>
+                <span className="text-pink-200 text-sm">Carregando 3D...</span>
               </div>
             </div>
           }>
@@ -493,13 +490,13 @@ export const PregnancyTracker = () => {
               variant="ghost"
               onClick={() => setCurrentWeek(Math.max(4, currentWeek - 1))}
               disabled={currentWeek <= 4}
-              className="text-white hover:bg-white/10"
+              className="text-pink-200 hover:bg-purple-800/50 hover:text-white"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             
             <div className="text-center">
-              <p className="text-white/70 text-xs">
+              <p className="text-pink-300 text-xs font-medium">
                 {isPT ? 'Idade do bebê' : "Baby's age"}
               </p>
               <p className="text-white font-bold text-xl">
@@ -511,7 +508,7 @@ export const PregnancyTracker = () => {
               variant="ghost"
               onClick={() => setCurrentWeek(Math.min(40, currentWeek + 1))}
               disabled={currentWeek >= 40}
-              className="text-white hover:bg-white/10"
+              className="text-pink-200 hover:bg-purple-800/50 hover:text-white"
             >
               <ArrowRight className="w-5 h-5" />
             </Button>
@@ -519,7 +516,7 @@ export const PregnancyTracker = () => {
         </Card>
 
         {/* Informações da semana */}
-        <Card className="p-4 bg-white/10 backdrop-blur-sm border-white/20">
+        <Card className="p-4 bg-gradient-to-br from-purple-900/80 to-indigo-900/80 border-purple-500/30">
           <div className="flex items-center gap-2 mb-3">
             <Info className="w-5 h-5 text-pink-400" />
             <h3 className="text-white font-semibold">
@@ -528,21 +525,21 @@ export const PregnancyTracker = () => {
           </div>
           
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <p className="text-white/60 text-xs">{isPT ? 'Tamanho' : 'Size'}</p>
+            <div className="bg-purple-800/60 rounded-lg p-3 text-center border border-purple-500/20">
+              <p className="text-pink-300 text-xs font-medium">{isPT ? 'Tamanho' : 'Size'}</p>
               <p className="text-white font-bold">{weekData.size}</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <p className="text-white/60 text-xs">{isPT ? 'Peso' : 'Weight'}</p>
+            <div className="bg-purple-800/60 rounded-lg p-3 text-center border border-purple-500/20">
+              <p className="text-pink-300 text-xs font-medium">{isPT ? 'Peso' : 'Weight'}</p>
               <p className="text-white font-bold">{weekData.weight}</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <p className="text-white/60 text-xs">{isPT ? 'Comparação' : 'Compared to'}</p>
+            <div className="bg-purple-800/60 rounded-lg p-3 text-center border border-purple-500/20">
+              <p className="text-pink-300 text-xs font-medium">{isPT ? 'Comparação' : 'Compared to'}</p>
               <p className="text-white font-bold text-xs">{weekData.comparison}</p>
             </div>
           </div>
 
-          <p className="text-white/80 text-sm mb-4">{weekData.description}</p>
+          <p className="text-pink-100 text-sm mb-4">{weekData.description}</p>
 
           <div className="space-y-2">
             <p className="text-white font-medium text-sm">
@@ -551,7 +548,7 @@ export const PregnancyTracker = () => {
             {weekData.developments.map((dev, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Heart className="w-3 h-3 text-pink-400 flex-shrink-0" />
-                <span className="text-white/80 text-sm">{dev}</span>
+                <span className="text-pink-100 text-sm">{dev}</span>
               </div>
             ))}
           </div>
@@ -561,7 +558,7 @@ export const PregnancyTracker = () => {
         <Button
           variant="outline"
           onClick={() => setShowGrowthChart(!showGrowthChart)}
-          className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+          className="w-full bg-purple-800/50 border-pink-500/30 text-pink-200 hover:bg-purple-700/50 hover:text-white"
         >
           <TrendingUp className="w-4 h-4 mr-2" />
           {showGrowthChart 

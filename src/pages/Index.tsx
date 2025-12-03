@@ -44,11 +44,10 @@ const Index = () => {
 
   const handleNameSubmit = () => {
     if (tempName.trim()) {
-      // Validação e sanitização do nome
       const sanitizedName = tempName
         .trim()
-        .slice(0, 50) // Limite de 50 caracteres
-        .replace(/[<>]/g, ''); // Remove caracteres perigosos
+        .slice(0, 50)
+        .replace(/[<>]/g, '');
       
       if (sanitizedName.length < 2) {
         const message = isUSA 
@@ -96,12 +95,12 @@ const Index = () => {
     <>
       <AntiInspect />
       <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-2xl text-center">
+            <DialogTitle className="text-2xl text-center text-foreground">
               {isUSA ? 'Welcome, Mom! 💝' : 'Bem-vinda, Mamãe! 💝'}
             </DialogTitle>
-            <DialogDescription className="text-center text-base pt-2">
+            <DialogDescription className="text-center text-base pt-2 text-muted-foreground">
               {isUSA 
                 ? 'Enter your name so I can create a special experience for you'
                 : 'Informe o seu nome para que eu possa criar uma experiência especial para você'}
@@ -113,7 +112,7 @@ const Index = () => {
               value={tempName}
               onChange={(e) => setTempName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleNameSubmit()}
-              className="text-center text-lg"
+              className="text-center text-lg bg-muted border-border text-foreground"
               autoFocus
               maxLength={50}
               minLength={2}
@@ -121,7 +120,7 @@ const Index = () => {
             <Button 
               onClick={handleNameSubmit} 
               disabled={!tempName.trim()}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
               size="lg"
             >
               {isUSA ? 'Start my journey 🌟' : 'Começar minha jornada 🌟'}
@@ -130,31 +129,31 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--bg-gradient-start))] via-[hsl(var(--bg-gradient-middle))] to-[hsl(var(--bg-gradient-end))] dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 transition-colors duration-500">
+      <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--bg-gradient-start))] via-[hsl(var(--bg-gradient-middle))] to-[hsl(var(--bg-gradient-end))] transition-colors duration-500">
         <div className="w-full max-w-md mx-auto p-4 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2 animate-fade-in pt-2">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <Sparkles className="w-6 h-6 text-pink-500 animate-pulse" />
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <Sparkles className="w-6 h-6 text-pink-400 animate-pulse" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
                 {isUSA ? 'Mom Zen' : 'Mamãe Zen'}
               </h1>
-              <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
+              <Sparkles className="w-6 h-6 text-purple-400 animate-pulse" />
             </div>
-            <p className="text-muted-foreground text-sm font-medium px-4">
+            <p className="text-pink-200/80 text-sm font-medium px-4">
               {isUSA ? '✨ Premium motherhood app ✨' : '✨ App premium de maternidade ✨'}
             </p>
             <a 
               href="https://www.instagram.com/app_mamae_zen?igsh=bGlydG9udHp3aXhs" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-pink-600 transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-pink-300/70 hover:text-pink-300 transition-colors"
             >
               <Instagram className="w-5 h-5" />
               <span>@app_mamae_zen</span>
             </a>
-            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs">PREMIUM</span>
+            <div className="flex items-center justify-center gap-2 text-xs">
+              <span className="px-3 py-1 rounded-full bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-200 font-semibold text-xs border border-pink-400/30">PREMIUM</span>
             </div>
           </div>
 
@@ -177,35 +176,39 @@ const Index = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="guides" className="animate-fade-in">
-            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1 bg-gradient-to-r from-pink-100/50 via-purple-100/50 to-blue-100/50 dark:from-pink-950/30 dark:via-purple-950/30 dark:to-blue-950/30">
-              <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1.5 bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-indigo-900/50 border border-pink-500/20 rounded-xl">
+              <TabsTrigger value="guides" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <Baby className="w-4 h-4" />
                 <span>{isUSA ? 'Guides' : 'Guias'}</span>
               </TabsTrigger>
-              <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+              <TabsTrigger value="sounds" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <Music className="w-4 h-4" />
                 <span>{isUSA ? 'Music' : 'Músicas'}</span>
               </TabsTrigger>
-              <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+              <TabsTrigger value="medicine" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <Pill className="w-4 h-4" />
                 <span>{isUSA ? 'Medicine' : 'Remédios'}</span>
               </TabsTrigger>
-              <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+              <TabsTrigger value="emergency" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <MapPin className="w-4 h-4" />
                 <span>{isUSA ? 'Emergency' : 'Emergência'}</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsList className="grid w-full grid-cols-3 gap-1 h-auto p-1 mt-2 bg-gradient-to-r from-pink-100/50 via-purple-100/50 to-blue-100/50 dark:from-pink-950/30 dark:via-purple-950/30 dark:to-blue-950/30">
-              <TabsTrigger value="notifications" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+            <TabsList className="grid w-full grid-cols-4 gap-1 h-auto p-1.5 mt-2 bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-indigo-900/50 border border-pink-500/20 rounded-xl">
+              <TabsTrigger value="notifications" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <Bell className="w-4 h-4" />
                 <span>{isUSA ? 'Reminders' : 'Lembretes'}</span>
               </TabsTrigger>
-              <TabsTrigger value="pharmacy" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+              <TabsTrigger value="pharmacy" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <Cross className="w-4 h-4" />
                 <span>{isUSA ? 'Pharmacy' : 'Farmácia'}</span>
               </TabsTrigger>
-              <TabsTrigger value="shop" className="flex-col gap-1 py-2 px-1 text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-md transition-all">
+              <TabsTrigger value="pregnancy" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
+                <Heart className="w-4 h-4" />
+                <span>{isUSA ? 'Pregnancy' : 'Gravidez'}</span>
+              </TabsTrigger>
+              <TabsTrigger value="shop" className="flex-col gap-1 py-2 px-1 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-pink-500/30 rounded-lg transition-all">
                 <ShoppingBag className="w-4 h-4" />
                 <span>{isUSA ? 'Shop' : 'Lojinha'}</span>
               </TabsTrigger>
@@ -218,17 +221,18 @@ const Index = () => {
               <TabsContent value="emergency" className="mt-0 animate-fade-in"><EmergencyMap /></TabsContent>
               <TabsContent value="notifications" className="mt-0 animate-fade-in"><NotificationCenter /></TabsContent>
               <TabsContent value="pharmacy" className="mt-0 animate-fade-in"><PharmacyMap /></TabsContent>
+              <TabsContent value="pregnancy" className="mt-0 animate-fade-in"><PregnancyTracker /></TabsContent>
               <TabsContent value="shop" className="mt-0 animate-fade-in">
-                <Card className="p-6 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 border-pink-200 dark:border-pink-800">
+                <Card className="p-6 bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-pink-500/20">
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-pink-700 dark:text-pink-300">
+                    <div className="flex items-center gap-2 text-pink-300">
                       <ShoppingBag className="w-6 h-6" />
                       <h3 className="font-semibold text-xl">
                         {isUSA ? 'Mom Shop' : 'Lojinha da Mamãe'}
                       </h3>
                     </div>
                     
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-pink-200/70">
                       {isUSA 
                         ? 'Discover amazing products selected especially for you and your baby!'
                         : 'Descubra produtos incríveis selecionados especialmente para você e seu bebê!'}
@@ -236,14 +240,14 @@ const Index = () => {
 
                     <Button 
                       onClick={() => window.open('https://collshp.com/mamaezenshopping', '_blank')}
-                      className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-6"
+                      className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-6 shadow-lg shadow-pink-500/30"
                       size="lg"
                     >
                       <ShoppingBag className="w-5 h-5 mr-2" />
                       {isUSA ? 'Visit Shop' : 'Visitar Lojinha'}
                     </Button>
 
-                    <p className="text-xs text-center text-muted-foreground">
+                    <p className="text-xs text-center text-pink-300/60">
                       {isUSA 
                         ? '✨ Special products for moms and babies'
                         : '✨ Produtos especiais para mamães e bebês'}
@@ -254,37 +258,33 @@ const Index = () => {
             </div>
 
             {/* Secondary Tabs - Collapsible */}
-            <div className="mt-4 p-3 rounded-lg bg-card border border-primary/20 shadow-md">
+            <div className="mt-4 p-3 rounded-xl bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/20 shadow-lg">
               <details className="group">
-                <summary className="cursor-pointer list-none flex items-center justify-between font-semibold text-sm">
+                <summary className="cursor-pointer list-none flex items-center justify-between font-semibold text-sm text-pink-200">
                   <span>{isUSA ? '✨ More Premium Features' : '✨ Mais Recursos Premium'}</span>
-                  <span className="transition group-open:rotate-180">▼</span>
+                  <span className="transition group-open:rotate-180 text-pink-400">▼</span>
                 </summary>
                 <div className="mt-3 space-y-2">
-                  <TabsList className="grid w-full grid-cols-2 gap-1 h-auto p-1">
-                    <TabsTrigger value="sleep" className="flex-col gap-1 py-2 text-xs">
+                  <TabsList className="grid w-full grid-cols-2 gap-1 h-auto p-1.5 bg-purple-900/30 rounded-lg">
+                    <TabsTrigger value="sleep" className="flex-col gap-1 py-2 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg">
                       <Moon className="w-4 h-4" />
                       <span>{isUSA ? 'Sleep' : 'Sono'}</span>
                     </TabsTrigger>
-                    <TabsTrigger value="feeding" className="flex-col gap-1 py-2 text-xs">
+                    <TabsTrigger value="feeding" className="flex-col gap-1 py-2 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg">
                       <Milk className="w-4 h-4" />
                       <span>{isUSA ? 'Feed' : 'Mamar'}</span>
                     </TabsTrigger>
-                    <TabsTrigger value="autism" className="flex-col gap-1 py-2 text-xs">
+                    <TabsTrigger value="autism" className="flex-col gap-1 py-2 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg">
                       <Brain className="w-4 h-4" />
                       <span>{isUSA ? 'Autism' : 'Autismo'}</span>
                     </TabsTrigger>
-                    <TabsTrigger value="routine" className="flex-col gap-1 py-2 text-xs">
+                    <TabsTrigger value="routine" className="flex-col gap-1 py-2 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg">
                       <Calendar className="w-4 h-4" />
                       <span>{isUSA ? 'Routine' : 'Rotina'}</span>
                     </TabsTrigger>
-                    <TabsTrigger value="ebook" className="flex-col gap-1 py-2 text-xs">
+                    <TabsTrigger value="ebook" className="flex-col gap-1 py-2 text-xs text-pink-100 data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg col-span-2">
                       <BookOpen className="w-4 h-4" />
                       <span>{isUSA ? 'E-book' : 'E-book'}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="pregnancy" className="flex-col gap-1 py-2 text-xs">
-                      <Heart className="w-4 h-4" />
-                      <span>{isUSA ? 'Pregnancy' : 'Gravidez'}</span>
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="sleep" className="mt-2"><SleepTracker /></TabsContent>
@@ -292,30 +292,29 @@ const Index = () => {
                   <TabsContent value="autism" className="mt-2"><AutismGuide /></TabsContent>
                   <TabsContent value="routine" className="mt-2"><RoutineCalendar /></TabsContent>
                   <TabsContent value="ebook" className="mt-2"><GuideLibrary /></TabsContent>
-                  <TabsContent value="pregnancy" className="mt-2"><PregnancyTracker /></TabsContent>
                 </div>
               </details>
             </div>
           </Tabs>
 
           {/* Footer */}
-          <div className="text-center space-y-2 pt-6 pb-4 border-t">
-            <p className="text-xs text-muted-foreground">
+          <div className="text-center space-y-2 pt-6 pb-4 border-t border-pink-500/20">
+            <p className="text-xs text-pink-300/60">
               {isUSA ? '💝 Made with love for moms' : '💝 Feito com amor para mamães'}
             </p>
-            <p className="text-xs font-semibold">
+            <p className="text-xs font-semibold text-pink-200">
               © {new Date().getFullYear()} {isUSA ? 'Mom Zen Premium' : 'Mamãe Zen Premium'}
             </p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[10px] text-pink-300/50">
               {isUSA ? 'All rights reserved to' : 'Todos os direitos reservados a'}{' '}
-              <span className="text-primary font-semibold">Hemerson Deckson</span>
+              <span className="text-pink-400 font-semibold">Hemerson Deckson</span>
             </p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[10px] text-pink-300/50">
               {isUSA ? 'Developed with 💝 by' : 'Desenvolvido com 💝 por'}{' '}
-              <span className="text-primary font-semibold">Hemerson Deckson</span>
+              <span className="text-pink-400 font-semibold">Hemerson Deckson</span>
             </p>
             <Link to="/privacy">
-              <Button variant="link" size="sm" className="text-[10px] h-auto p-0">
+              <Button variant="link" size="sm" className="text-[10px] h-auto p-0 text-pink-400 hover:text-pink-300">
                 {isUSA ? 'Privacy Policy' : 'Política de Privacidade'}
               </Button>
             </Link>

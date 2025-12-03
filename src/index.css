@@ -8,95 +8,99 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 330 100% 98%;
-    --foreground: 330 15% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 330 15% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 330 15% 15%;
-    --primary: 330 85% 55%;
+    --background: 270 50% 8%;
+    --foreground: 300 20% 98%;
+    --card: 270 45% 12%;
+    --card-foreground: 300 20% 98%;
+    --popover: 270 45% 12%;
+    --popover-foreground: 300 20% 98%;
+    --primary: 330 85% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 280 75% 65%;
+    --secondary: 280 75% 55%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 330 30% 95%;
-    --muted-foreground: 330 10% 45%;
-    --accent: 280 70% 92%;
-    --accent-foreground: 280 85% 25%;
+    --muted: 270 30% 18%;
+    --muted-foreground: 300 15% 70%;
+    --accent: 280 70% 25%;
+    --accent-foreground: 300 20% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 330 30% 90%;
-    --input: 330 30% 88%;
-    --ring: 330 85% 55%;
+    --border: 270 30% 25%;
+    --input: 270 30% 20%;
+    --ring: 330 85% 60%;
     --radius: 0.75rem;
 
-    /* Custom maternal theme tokens */
-    --gradient-calm: linear-gradient(135deg, hsl(320 45% 75%) 0%, hsl(280 40% 80%) 50%, hsl(200 35% 85%) 100%);
-    --gradient-evening: linear-gradient(135deg, hsl(260 50% 70%) 0%, hsl(280 45% 75%) 100%);
-    --gradient-morning: linear-gradient(135deg, hsl(40 80% 85%) 0%, hsl(320 40% 85%) 100%);
+    /* Custom premium theme tokens - Purple/Pink/Indigo */
+    --gradient-premium: linear-gradient(135deg, hsl(270 80% 15%) 0%, hsl(300 70% 20%) 50%, hsl(330 70% 25%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(270 60% 18%) 0%, hsl(280 50% 22%) 100%);
+    --gradient-button: linear-gradient(135deg, hsl(330 85% 55%) 0%, hsl(280 75% 55%) 100%);
     
-    --shadow-soft: 0 4px 20px -4px hsl(320 45% 65% / 0.15);
-    --shadow-glow: 0 0 30px hsl(320 45% 75% / 0.2);
+    --shadow-glow-pink: 0 0 30px hsl(330 85% 60% / 0.3);
+    --shadow-glow-purple: 0 0 30px hsl(280 75% 55% / 0.3);
     
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 270 50% 10%;
+    --sidebar-foreground: 300 20% 98%;
+    --sidebar-primary: 330 85% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 280 60% 20%;
+    --sidebar-accent-foreground: 300 20% 98%;
+    --sidebar-border: 270 30% 25%;
+    --sidebar-ring: 330 85% 60%;
     
-    /* Gradientes de fundo - agora inspirados no Mamãe Zen Music (roxo/rosa/azul escuro) */
-    --bg-gradient-start: 275 85% 14%;
-    --bg-gradient-middle: 330 80% 16%;
-    --bg-gradient-end: 220 80% 18%;
+    /* Gradientes de fundo premium - roxo/rosa/índigo */
+    --bg-gradient-start: 270 80% 12%;
+    --bg-gradient-middle: 300 70% 18%;
+    --bg-gradient-end: 330 70% 22%;
   }
 
-  /* Tema Rosa Choque (mantém identidade, porém mais profundo/premium) */
+  /* Tema Rosa - mais roxo/rosa profundo premium */
   [data-theme="pink"] {
-    --bg-gradient-start: 330 85% 20%;
-    --bg-gradient-middle: 320 80% 22%;
-    --bg-gradient-end: 300 75% 24%;
+    --bg-gradient-start: 300 75% 15%;
+    --bg-gradient-middle: 320 70% 20%;
+    --bg-gradient-end: 340 65% 25%;
+    --primary: 330 85% 60%;
+    --secondary: 300 70% 55%;
   }
 
-  /* Tema Azul inspirado nas cores do player (azul/roxo profundo) */
+  /* Tema Azul - índigo/roxo profundo premium */
   [data-theme="blue"] {
-    --bg-gradient-start: 220 80% 18%;
-    --bg-gradient-middle: 215 75% 20%;
-    --bg-gradient-end: 230 80% 22%;
+    --bg-gradient-start: 250 80% 15%;
+    --bg-gradient-middle: 260 75% 20%;
+    --bg-gradient-end: 280 70% 25%;
+    --primary: 260 85% 65%;
+    --secondary: 280 70% 55%;
   }
 
   .dark {
-    --background: 330 25% 8%;
-    --foreground: 330 10% 95%;
-    --card: 330 25% 10%;
-    --card-foreground: 330 10% 95%;
-    --popover: 330 25% 10%;
-    --popover-foreground: 330 10% 95%;
+    --background: 270 50% 6%;
+    --foreground: 300 20% 98%;
+    --card: 270 45% 10%;
+    --card-foreground: 300 20% 98%;
+    --popover: 270 45% 10%;
+    --popover-foreground: 300 20% 98%;
     --primary: 330 85% 60%;
     --primary-foreground: 0 0% 100%;
     --secondary: 280 70% 55%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 330 20% 18%;
-    --muted-foreground: 330 10% 65%;
-    --accent: 280 60% 20%;
-    --accent-foreground: 280 10% 95%;
+    --muted: 270 20% 15%;
+    --muted-foreground: 300 10% 65%;
+    --accent: 280 60% 18%;
+    --accent-foreground: 300 20% 98%;
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 330 20% 20%;
-    --input: 330 20% 18%;
+    --border: 270 20% 22%;
+    --input: 270 20% 18%;
     --ring: 330 85% 60%;
     
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 270 50% 8%;
+    --sidebar-foreground: 300 20% 98%;
+    --sidebar-primary: 330 85% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 280 50% 15%;
+    --sidebar-accent-foreground: 300 20% 98%;
+    --sidebar-border: 270 20% 20%;
+    --sidebar-ring: 330 85% 60%;
   }
 }
 
