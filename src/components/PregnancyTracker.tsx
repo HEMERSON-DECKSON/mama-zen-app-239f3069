@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar, Baby, Heart, ArrowLeft, ArrowRight, TrendingUp, Info } from 'lucide-react';
+import { Calendar, Baby, Heart, ArrowLeft, ArrowRight, TrendingUp, Info, Loader2 } from 'lucide-react';
 import { useCountry } from '@/contexts/CountryContext';
+
+const Baby3D = lazy(() => import('./Baby3D'));
 
 interface PregnancyData {
   lastPeriodDate: string;
@@ -320,102 +322,6 @@ export const PregnancyTracker = () => {
   const weekData = getWeekData(currentWeek);
   const trimester = getTrimester(currentWeek);
 
-  // SVG do bebê estilizado para cada fase
-  const BabyIllustration = ({ week }: { week: number }) => {
-    const size = Math.min(100 + (week * 3), 200);
-    const opacity = 0.9;
-    
-    return (
-      <div className="relative w-64 h-64 mx-auto">
-        {/* Útero estilizado */}
-        <svg viewBox="0 0 200 200" className="w-full h-full">
-          <defs>
-            <radialGradient id="uterusGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#fce7f3" />
-              <stop offset="70%" stopColor="#f9a8d4" />
-              <stop offset="100%" stopColor="#ec4899" />
-            </radialGradient>
-            <radialGradient id="amnioticGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#fdf4ff" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#f0abfc" stopOpacity="0.6" />
-            </radialGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-          
-          {/* Útero */}
-          <ellipse cx="100" cy="100" rx="85" ry="90" fill="url(#uterusGradient)" opacity="0.8" />
-          
-          {/* Líquido amniótico */}
-          <ellipse cx="100" cy="100" rx="70" ry="75" fill="url(#amnioticGradient)" />
-          
-          {/* Bebê simplificado */}
-          <g transform={`translate(${100 - size/4}, ${100 - size/4})`} filter="url(#glow)">
-            {week < 10 ? (
-              // Embrião (forma mais simples)
-              <ellipse 
-                cx={size/4} 
-                cy={size/4} 
-                rx={size/6} 
-                ry={size/5} 
-                fill="#fcd5ce" 
-                opacity={opacity}
-              />
-            ) : week < 20 ? (
-              // Feto em desenvolvimento
-              <g>
-                {/* Corpo */}
-                <ellipse cx={size/4} cy={size/3} rx={size/8} ry={size/5} fill="#fcd5ce" opacity={opacity} />
-                {/* Cabeça */}
-                <circle cx={size/4} cy={size/8} r={size/7} fill="#fcd5ce" opacity={opacity} />
-                {/* Braços */}
-                <ellipse cx={size/8} cy={size/4} rx={size/20} ry={size/12} fill="#fcd5ce" opacity={opacity} />
-                <ellipse cx={size/2.5} cy={size/4} rx={size/20} ry={size/12} fill="#fcd5ce" opacity={opacity} />
-                {/* Pernas */}
-                <ellipse cx={size/5} cy={size/2} rx={size/25} ry={size/10} fill="#fcd5ce" opacity={opacity} />
-                <ellipse cx={size/3} cy={size/2} rx={size/25} ry={size/10} fill="#fcd5ce" opacity={opacity} />
-              </g>
-            ) : (
-              // Bebê mais desenvolvido
-              <g>
-                {/* Corpo */}
-                <ellipse cx={size/4} cy={size/2.5} rx={size/6} ry={size/4} fill="#fcd5ce" opacity={opacity} />
-                {/* Cabeça */}
-                <circle cx={size/4} cy={size/8} r={size/5.5} fill="#fcd5ce" opacity={opacity} />
-                {/* Olhos fechados */}
-                <path d={`M${size/5.5} ${size/9} Q${size/4} ${size/7.5} ${size/3.2} ${size/9}`} stroke="#d4a5a5" fill="none" strokeWidth="1" />
-                {/* Braços */}
-                <ellipse cx={size/10} cy={size/3} rx={size/18} ry={size/8} fill="#fcd5ce" opacity={opacity} transform={`rotate(-20 ${size/10} ${size/3})`} />
-                <ellipse cx={size/2.2} cy={size/3} rx={size/18} ry={size/8} fill="#fcd5ce" opacity={opacity} transform={`rotate(20 ${size/2.2} ${size/3})`} />
-                {/* Pernas dobradas */}
-                <ellipse cx={size/6} cy={size/1.7} rx={size/12} ry={size/7} fill="#fcd5ce" opacity={opacity} transform={`rotate(30 ${size/6} ${size/1.7})`} />
-                <ellipse cx={size/2.8} cy={size/1.7} rx={size/12} ry={size/7} fill="#fcd5ce" opacity={opacity} transform={`rotate(-30 ${size/2.8} ${size/1.7})`} />
-                {/* Cordão umbilical */}
-                <path 
-                  d={`M${size/4} ${size/2} Q${size/2} ${size/1.5} ${size/1.5} ${size/1.2}`} 
-                  stroke="#d97b9f" 
-                  fill="none" 
-                  strokeWidth="3"
-                  opacity="0.7"
-                />
-              </g>
-            )}
-          </g>
-        </svg>
-        
-        {/* Indicador de semana */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-          {week} {isPT ? 'semanas' : 'weeks'}
-        </div>
-      </div>
-    );
-  };
-
   // Gráfico de crescimento simplificado
   const GrowthChart = () => {
     const weeks = [8, 12, 16, 20, 24, 28, 32, 36, 40];
@@ -568,9 +474,18 @@ export const PregnancyTracker = () => {
           </Button>
         </Card>
 
-        {/* Ilustração do bebê */}
-        <Card className="p-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm border-white/20">
-          <BabyIllustration week={currentWeek} />
+        {/* Ilustração 3D do bebê */}
+        <Card className="p-4 bg-gradient-to-br from-purple-900/30 via-pink-800/20 to-indigo-900/30 backdrop-blur-sm border-purple-500/20">
+          <Suspense fallback={
+            <div className="w-full h-72 flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-2xl">
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
+                <span className="text-white/70 text-sm">Carregando 3D...</span>
+              </div>
+            </div>
+          }>
+            <Baby3D week={currentWeek} />
+          </Suspense>
           
           {/* Navegação entre semanas */}
           <div className="flex items-center justify-between mt-4">
