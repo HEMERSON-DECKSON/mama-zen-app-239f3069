@@ -291,16 +291,21 @@ const Scene = ({ week }: { week: number }) => {
 
 export const Baby3D = ({ week }: Baby3DProps) => {
   return (
-    <div className="relative w-full h-72 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-900/40 via-pink-800/30 to-indigo-900/40 backdrop-blur-sm border border-purple-500/20">
+    <div className="relative w-full h-72 rounded-2xl overflow-hidden border-2 border-purple-500/40 shadow-xl shadow-purple-500/20" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 25%, #831843 50%, #4c1d95 75%, #1e1b4b 100%)' }}>
       <Canvas
         camera={{ position: [0, 0, 4], fov: 50 }}
-        style={{ background: 'transparent' }}
+        gl={{ alpha: true, antialias: true }}
+        dpr={[1, 2]}
       >
+        <color attach="background" args={['#1a0a2e']} />
         <Scene week={week} />
       </Canvas>
       
       {/* Overlay com gradiente */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-purple-900/30 via-transparent to-pink-900/20 rounded-2xl" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-purple-900/50 via-transparent to-pink-900/30 rounded-2xl" />
+      
+      {/* Brilho nas bordas */}
+      <div className="absolute inset-0 pointer-events-none rounded-2xl ring-1 ring-inset ring-white/10" />
       
       {/* Indicador de semana */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-purple-500/40">
@@ -308,7 +313,7 @@ export const Baby3D = ({ week }: Baby3DProps) => {
       </div>
       
       {/* Dica de interação */}
-      <div className="absolute top-3 right-3 text-white/50 text-xs">
+      <div className="absolute top-3 right-3 text-white/60 text-xs bg-black/30 px-2 py-1 rounded-full">
         👆 Arraste para girar
       </div>
     </div>
