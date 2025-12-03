@@ -18,10 +18,10 @@ const ThemeSelector = () => {
   };
 
   return (
-    <Card className="p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-primary/20">
+    <Card className="p-4 bg-gradient-to-br from-purple-900/50 to-pink-900/50 border-pink-500/20">
       <div className="flex items-center gap-2 mb-3">
-        <Palette className="w-5 h-5 text-primary" />
-        <h3 className="font-bold text-sm">
+        <Palette className="w-5 h-5 text-pink-400" />
+        <h3 className="font-bold text-sm text-pink-200">
           {isUSA ? 'Choose Theme' : 'Escolha o Tema'}
         </h3>
       </div>
@@ -32,8 +32,8 @@ const ThemeSelector = () => {
           variant={themeColor === 'pink' ? 'default' : 'outline'}
           className={`${
             themeColor === 'pink' 
-              ? 'bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-700 hover:to-pink-600' 
-              : 'border-pink-300 hover:bg-pink-50 hover:text-pink-600'
+              ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-lg shadow-pink-500/30' 
+              : 'border-pink-500/30 bg-purple-900/30 text-pink-200 hover:bg-purple-800/50 hover:text-pink-100'
           }`}
           size="sm"
         >
@@ -46,8 +46,8 @@ const ThemeSelector = () => {
           variant={themeColor === 'blue' ? 'default' : 'outline'}
           className={`${
             themeColor === 'blue' 
-              ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600' 
-              : 'border-blue-300 hover:bg-blue-50 hover:text-blue-600'
+              ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg shadow-indigo-500/30' 
+              : 'border-purple-500/30 bg-purple-900/30 text-purple-200 hover:bg-purple-800/50 hover:text-purple-100'
           }`}
           size="sm"
         >
