@@ -19,7 +19,7 @@ const MedicineGuide = () => {
             <CardTitle className="text-lg">{isUSA ? 'Medicine Guide' : 'Guia de Medicamentos'}</CardTitle>
           </div>
           <CardDescription className="text-xs">
-            ⚠️ ATENÇÃO: Sempre consulte um pediatra antes de administrar qualquer medicamento ao seu bebê
+            ⚠️ {isUSA ? "WARNING: Always consult a pediatrician before giving any medication to your baby" : "ATENÇÃO: Sempre consulte um pediatra antes de administrar qualquer medicamento ao seu bebê"}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -29,7 +29,7 @@ const MedicineGuide = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Baby className="w-5 h-5 text-primary" />
-            <CardTitle className="text-base">Medicamentos para o Bebê</CardTitle>
+            <CardTitle className="text-base">{isUSA ? "Baby Medicines" : "Medicamentos para o Bebê"}</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-3 pt-0">
@@ -45,17 +45,23 @@ const MedicineGuide = () => {
                 </AccordionTrigger>
                 <AccordionContent className="text-xs space-y-2 pb-3">
                   <div>
-                    <p className="font-semibold text-primary">Para que serve:</p>
+                    <p className="font-semibold text-primary">{isUSA ? "What it's for:" : "Para que serve:"}</p>
                     <p>{med.use}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-primary">Dosagem:</p>
+                    <p className="font-semibold text-primary">{isUSA ? "Dosage:" : "Dosagem:"}</p>
                     <p>{med.dosage}</p>
                   </div>
                   <div className="bg-amber-50 dark:bg-amber-950/20 p-2 rounded-lg border border-amber-200 dark:border-amber-900">
-                    <p className="font-semibold text-amber-700 dark:text-amber-400">⚠️ Importante:</p>
+                    <p className="font-semibold text-amber-700 dark:text-amber-400">⚠️ {isUSA ? "Important:" : "Importante:"}</p>
                     <p className="text-amber-900 dark:text-amber-300">{med.warning}</p>
                   </div>
+                  {med.risks && (
+                    <div className="bg-red-50 dark:bg-red-950/20 p-2 rounded-lg border border-red-200 dark:border-red-900">
+                      <p className="font-semibold text-red-700 dark:text-red-400">🚨 {isUSA ? "Risks if misused:" : "Riscos se usado errado:"}</p>
+                      <p className="text-red-900 dark:text-red-300">{med.risks}</p>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
@@ -68,10 +74,10 @@ const MedicineGuide = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            <CardTitle className="text-base">Medicamentos para a Mamãe</CardTitle>
+            <CardTitle className="text-base">{isUSA ? "Mom's Medicines" : "Medicamentos para a Mamãe"}</CardTitle>
           </div>
           <CardDescription className="text-xs">
-            Medicamentos seguros durante a amamentação
+            {isUSA ? "Safe medicines during breastfeeding" : "Medicamentos seguros durante a amamentação"}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-3 pt-0">
@@ -83,29 +89,35 @@ const MedicineGuide = () => {
                     <Pill className="w-4 h-4 text-primary" />
                     <span className="font-semibold">{med.name}</span>
                     {med.safe ? (
-                      <Badge className="text-[10px] px-1.5 py-0 bg-green-500">✓ Seguro</Badge>
+                      <Badge className="text-[10px] px-1.5 py-0 bg-green-500">✓ {isUSA ? "Safe" : "Seguro"}</Badge>
                     ) : (
-                      <Badge variant="destructive" className="text-[10px] px-1.5 py-0">⚠️ Cuidado</Badge>
+                      <Badge variant="destructive" className="text-[10px] px-1.5 py-0">⚠️ {isUSA ? "Caution" : "Cuidado"}</Badge>
                     )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-xs space-y-2 pb-3">
                   <div>
-                    <p className="font-semibold text-primary">Para que serve:</p>
+                    <p className="font-semibold text-primary">{isUSA ? "What it's for:" : "Para que serve:"}</p>
                     <p>{med.use}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-primary">Dosagem:</p>
+                    <p className="font-semibold text-primary">{isUSA ? "Dosage:" : "Dosagem:"}</p>
                     <p>{med.dosage}</p>
                   </div>
                   <div className={`p-2 rounded-lg border ${med.safe ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900' : 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900'}`}>
                     <p className={`font-semibold ${med.safe ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-amber-400'}`}>
-                      {med.safe ? '✓' : '⚠️'} Importante:
+                      {med.safe ? '✓' : '⚠️'} {isUSA ? "Important:" : "Importante:"}
                     </p>
                     <p className={med.safe ? 'text-green-900 dark:text-green-300' : 'text-amber-900 dark:text-amber-300'}>
                       {med.warning}
                     </p>
                   </div>
+                  {med.risks && (
+                    <div className="bg-red-50 dark:bg-red-950/20 p-2 rounded-lg border border-red-200 dark:border-red-900">
+                      <p className="font-semibold text-red-700 dark:text-red-400">🚨 {isUSA ? "Risks if misused:" : "Riscos se usado errado:"}</p>
+                      <p className="text-red-900 dark:text-red-300">{med.risks}</p>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
@@ -116,9 +128,9 @@ const MedicineGuide = () => {
       {/* Doenças Comuns */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Condições e Doenças Comuns</CardTitle>
+          <CardTitle className="text-base">{isUSA ? "Common Conditions & Illnesses" : "Condições e Doenças Comuns"}</CardTitle>
           <CardDescription className="text-xs">
-            Como identificar e tratar problemas comuns
+            {isUSA ? "How to identify and treat common problems" : "Como identificar e tratar problemas comuns"}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-3 pt-0">
@@ -130,17 +142,23 @@ const MedicineGuide = () => {
                 </AccordionTrigger>
                 <AccordionContent className="text-xs space-y-2 pb-3">
                   <div>
-                    <p className="font-semibold text-primary">Sintomas:</p>
+                    <p className="font-semibold text-primary">{isUSA ? "Symptoms:" : "Sintomas:"}</p>
                     <p>{item.symptoms}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-primary">Tratamento em casa:</p>
+                    <p className="font-semibold text-primary">{isUSA ? "Home treatment:" : "Tratamento em casa:"}</p>
                     <p>{item.treatment}</p>
                   </div>
-                  <div className="bg-red-50 dark:bg-red-950/20 p-2 rounded-lg border border-red-200 dark:border-red-900">
-                    <p className="font-semibold text-red-700 dark:text-red-400">🚨 Quando procurar médico:</p>
-                    <p className="text-red-900 dark:text-red-300">{item.when}</p>
+                  <div className="bg-amber-50 dark:bg-amber-950/20 p-2 rounded-lg border border-amber-200 dark:border-amber-900">
+                    <p className="font-semibold text-amber-700 dark:text-amber-400">🏥 {isUSA ? "When to see a doctor:" : "Quando procurar médico:"}</p>
+                    <p className="text-amber-900 dark:text-amber-300">{item.when}</p>
                   </div>
+                  {item.risks && (
+                    <div className="bg-red-50 dark:bg-red-950/20 p-2 rounded-lg border border-red-200 dark:border-red-900">
+                      <p className="font-semibold text-red-700 dark:text-red-400">🚨 {isUSA ? "SERIOUS RISKS:" : "RISCOS GRAVES:"}</p>
+                      <p className="text-red-900 dark:text-red-300">{item.risks}</p>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
