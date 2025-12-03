@@ -475,9 +475,9 @@ export const PregnancyTracker = () => {
         </Card>
 
         {/* Ilustração 3D do bebê */}
-        <Card className="p-4 bg-gradient-to-br from-purple-900/30 via-pink-800/20 to-indigo-900/30 backdrop-blur-sm border-purple-500/20">
+        <Card className="p-4 border-2 border-purple-500/30 shadow-xl shadow-purple-500/10" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #831843 100%)' }}>
           <Suspense fallback={
-            <div className="w-full h-72 flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-2xl">
+            <div className="w-full h-72 flex items-center justify-center rounded-2xl" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #831843 100%)' }}>
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
                 <span className="text-white/70 text-sm">Carregando 3D...</span>
