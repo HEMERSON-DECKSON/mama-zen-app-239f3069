@@ -47,7 +47,7 @@ const AutismGuide = () => {
         "Mostre o que vai acontecer antes de fazer (banho, comida, etc)",
         "Tenha paciência - pode levar tempo para o bebê entender"
       ],
-      color: "bg-blue-50 dark:bg-blue-950/20 border-blue-200"
+      color: "bg-blue-900/50 border-blue-500/50"
     },
     {
       title: "Ambiente Calmo",
@@ -59,7 +59,7 @@ const AutismGuide = () => {
         "Use música suave e sons da natureza",
         "Mantenha a temperatura confortável"
       ],
-      color: "bg-purple-50 dark:bg-purple-950/20 border-purple-200"
+      color: "bg-purple-900/50 border-purple-500/50"
     },
     {
       title: "Rotina Estruturada",
@@ -71,7 +71,7 @@ const AutismGuide = () => {
         "Celebre pequenas conquistas com reforço positivo",
         "Seja consistente todos os dias"
       ],
-      color: "bg-green-50 dark:bg-green-950/20 border-green-200"
+      color: "bg-green-900/50 border-green-500/50"
     },
     {
       title: "Estimulação Sensorial",
@@ -83,7 +83,7 @@ const AutismGuide = () => {
         "Brinquedos que fazem sons suaves",
         "Contato pele a pele sempre que possível"
       ],
-      color: "bg-pink-50 dark:bg-pink-950/20 border-pink-200"
+      color: "bg-pink-900/50 border-pink-500/50"
     },
     {
       title: "Alimentação",
@@ -95,7 +95,7 @@ const AutismGuide = () => {
         "Use pratos com divisórias se não gostar de comidas misturadas",
         "Textura pode ser mais importante que sabor"
       ],
-      color: "bg-orange-50 dark:bg-orange-950/20 border-orange-200"
+      color: "bg-orange-900/50 border-orange-500/50"
     },
     {
       title: "Sono",
@@ -107,7 +107,7 @@ const AutismGuide = () => {
         "Use objetos de transição (naninha, cheirinho)",
         "Considere usar ruído branco ou sons relaxantes"
       ],
-      color: "bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200"
+      color: "bg-indigo-900/50 border-indigo-500/50"
     }
   ];
 
@@ -145,13 +145,13 @@ const AutismGuide = () => {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-pink-950/20 border-2 border-primary/20">
+      <Card className="bg-gradient-to-br from-[#1e1b4b] via-[#581c87] to-[#831843] border-2 border-purple-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-primary animate-pulse" />
-            <CardTitle className="text-lg">Guia para Bebês Autistas</CardTitle>
+            <Brain className="w-5 h-5 text-pink-400 animate-pulse" />
+            <CardTitle className="text-lg text-white">Guia para Bebês Autistas</CardTitle>
           </div>
-          <CardDescription className="text-xs leading-relaxed">
+          <CardDescription className="text-xs leading-relaxed text-purple-200">
             💙 Informações e estratégias para apoiar o desenvolvimento de crianças no espectro autista. 
             Cada criança é única e especial! 🌈
           </CardDescription>
@@ -159,13 +159,13 @@ const AutismGuide = () => {
       </Card>
 
       {/* Sinais Precoces */}
-      <Card>
+      <Card className="bg-[#1e1b4b]/50 border-purple-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
-            <Eye className="w-5 h-5 text-primary" />
-            <CardTitle className="text-base">Sinais Precoces por Idade</CardTitle>
+            <Eye className="w-5 h-5 text-pink-400" />
+            <CardTitle className="text-base text-white">Sinais Precoces por Idade</CardTitle>
           </div>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-purple-200">
             Identificação precoce pode fazer toda a diferença
           </CardDescription>
         </CardHeader>
@@ -173,15 +173,15 @@ const AutismGuide = () => {
           {earlySigns.map((item, index) => {
             const Icon = item.icon;
             return (
-              <div key={index} className="bg-gradient-to-r from-primary/5 to-primary/10 p-3 rounded-lg border">
+              <div key={index} className="bg-[#1e1b4b] p-3 rounded-lg border border-purple-500/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <Icon className="w-4 h-4 text-primary" />
-                  <Badge variant="secondary" className="text-xs">{item.age}</Badge>
+                  <Icon className="w-4 h-4 text-pink-400" />
+                  <Badge className="text-xs bg-pink-500/20 text-pink-300 border-pink-500/30">{item.age}</Badge>
                 </div>
                 <ul className="space-y-1 text-xs">
                   {item.signs.map((sign, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">•</span>
+                    <li key={idx} className="flex items-start gap-2 text-purple-100">
+                      <span className="text-pink-400 mt-0.5">•</span>
                       <span>{sign}</span>
                     </li>
                   ))}
@@ -189,9 +189,9 @@ const AutismGuide = () => {
               </div>
             );
           })}
-          <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200">
-            <p className="text-xs text-amber-900 dark:text-amber-300">
-              <strong>⚠️ Importante:</strong> Estes são apenas sinais de alerta. Somente um profissional pode fazer o diagnóstico. 
+          <div className="bg-amber-900/50 p-3 rounded-lg border border-amber-500/50">
+            <p className="text-xs text-amber-200">
+              <strong className="text-amber-300">⚠️ Importante:</strong> Estes são apenas sinais de alerta. Somente um profissional pode fazer o diagnóstico. 
               Se você notar alguns desses sinais, procure um neuropediatra.
             </p>
           </div>
@@ -199,32 +199,32 @@ const AutismGuide = () => {
       </Card>
 
       {/* Estratégias */}
-      <Card>
+      <Card className="bg-[#1e1b4b]/50 border-purple-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            <CardTitle className="text-base">Estratégias de Apoio</CardTitle>
+            <Sparkles className="w-5 h-5 text-pink-400" />
+            <CardTitle className="text-base text-white">Estratégias de Apoio</CardTitle>
           </div>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-purple-200">
             Como ajudar seu bebê a se desenvolver e se sentir seguro
           </CardDescription>
         </CardHeader>
         <CardContent className="p-3 pt-0">
           <Accordion type="single" collapsible className="w-full">
             {strategies.map((strategy, index) => (
-              <AccordionItem key={index} value={`strategy-${index}`}>
+              <AccordionItem key={index} value={`strategy-${index}`} className="border-purple-500/30">
                 <AccordionTrigger className="text-sm py-2 hover:no-underline">
                   <div className="text-left">
-                    <p className="font-semibold">{strategy.title}</p>
-                    <p className="text-xs text-muted-foreground">{strategy.description}</p>
+                    <p className="font-semibold text-white">{strategy.title}</p>
+                    <p className="text-xs text-purple-300">{strategy.description}</p>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-xs pb-3">
                   <div className={`p-3 rounded-lg border ${strategy.color}`}>
                     <ul className="space-y-2">
                       {strategy.tips.map((tip, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5 font-bold">✓</span>
+                        <li key={idx} className="flex items-start gap-2 text-purple-100">
+                          <span className="text-pink-400 mt-0.5 font-bold">✓</span>
                           <span>{tip}</span>
                         </li>
                       ))}
@@ -238,21 +238,21 @@ const AutismGuide = () => {
       </Card>
 
       {/* Recursos e Suporte */}
-      <Card>
+      <Card className="bg-[#1e1b4b]/50 border-purple-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-primary" />
-            <CardTitle className="text-base">Recursos e Suporte</CardTitle>
+            <Heart className="w-5 h-5 text-pink-400" />
+            <CardTitle className="text-base text-white">Recursos e Suporte</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-3 pt-0 space-y-3">
           {resources.map((resource, index) => (
-            <div key={index} className="bg-gradient-to-r from-primary/5 to-primary/10 p-3 rounded-lg border">
-              <h4 className="font-semibold text-sm mb-2 text-primary">{resource.title}</h4>
+            <div key={index} className="bg-[#1e1b4b] p-3 rounded-lg border border-purple-500/30">
+              <h4 className="font-semibold text-sm mb-2 text-pink-300">{resource.title}</h4>
               <ul className="space-y-1.5 text-xs">
                 {resource.items.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-primary mt-0.5">💙</span>
+                  <li key={idx} className="flex items-start gap-2 text-purple-100">
+                    <span className="text-pink-400 mt-0.5">💙</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -262,10 +262,10 @@ const AutismGuide = () => {
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20">
+      <Card className="bg-gradient-to-r from-pink-900/50 to-purple-900/50 border-pink-500/30">
         <CardContent className="p-4">
-          <p className="text-xs text-center leading-relaxed">
-            <strong>💜 Lembre-se:</strong> Cada criança é única e se desenvolve no seu próprio ritmo. 
+          <p className="text-xs text-center leading-relaxed text-pink-200">
+            <strong className="text-pink-300">💜 Lembre-se:</strong> Cada criança é única e se desenvolve no seu próprio ritmo. 
             O autismo não define seu filho - ele é uma criança maravilhosa com necessidades especiais. 
             Você está fazendo um trabalho incrível! 🌈✨
           </p>
