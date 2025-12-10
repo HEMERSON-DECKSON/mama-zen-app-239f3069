@@ -1,15 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useState, useEffect } from "react";
-import { Play, Pause, Volume2, Music } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Play, Pause, Volume2, Music, Square } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
+import { useCountry } from "@/contexts/CountryContext";
 
 interface Sound {
   id: string;
   name: string;
+  nameEN: string;
   description: string;
+  descriptionEN: string;
   youtubeId: string;
   icon: string;
   quality: string;
@@ -19,23 +21,29 @@ const babySounds: Sound[] = [
   {
     id: "white-noise",
     name: "Ruído Branco",
+    nameEN: "White Noise",
     description: "Som contínuo que acalma o bebê",
-    youtubeId: "nMfPqeZjc2c", // 10h White Noise 4K
+    descriptionEN: "Continuous sound that calms baby",
+    youtubeId: "nMfPqeZjc2c",
     icon: "🌊",
     quality: "10h 4K"
   },
   {
     id: "rain",
     name: "Chuva Suave",
+    nameEN: "Gentle Rain",
     description: "Som relaxante de chuva caindo",
-    youtubeId: "mPZkdNFkNps", // 10h Rain Sounds 4K
+    descriptionEN: "Relaxing rain falling sound",
+    youtubeId: "mPZkdNFkNps",
     icon: "🌧️",
     quality: "10h 4K"
   },
   {
     id: "heartbeat",
     name: "Para você mamãe",
+    nameEN: "For you mom",
     description: "Melodia especial para o coração",
+    descriptionEN: "Special melody for the heart",
     youtubeId: "P9nd2GbmLWU",
     icon: "❤️",
     quality: "Premium HD"
@@ -43,119 +51,167 @@ const babySounds: Sound[] = [
   {
     id: "lullaby",
     name: "Canção de Ninar",
+    nameEN: "Lullaby",
     description: "Melodia suave para dormir",
-    youtubeId: "sgfMb2WycDo", // Vídeo especificado pelo usuário
+    descriptionEN: "Soft melody for sleeping",
+    youtubeId: "sgfMb2WycDo",
     icon: "🎵",
     quality: "HD"
   },
   {
     id: "ocean",
     name: "Ondas do Mar",
+    nameEN: "Ocean Waves",
     description: "Som tranquilo do oceano",
-    youtubeId: "WHPEKLQID4U", // 12h Ocean Waves 4K
+    descriptionEN: "Peaceful ocean sound",
+    youtubeId: "WHPEKLQID4U",
     icon: "🌊",
     quality: "12h 4K"
   },
   {
     id: "wind",
     name: "Vento Suave",
+    nameEN: "Gentle Wind",
     description: "Brisa relaxante",
-    youtubeId: "wzjWIxXBs_s", // 10h Wind Sounds 4K
+    descriptionEN: "Relaxing breeze",
+    youtubeId: "wzjWIxXBs_s",
     icon: "💨",
     quality: "10h 4K"
   }
 ];
 
 export default function BabySounds() {
+  const { isUSA } = useCountry();
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
-  const { 
-    isAPIReady, 
-    isPlaying, 
-    containerRef, 
-    initializePlayer, 
-    play, 
-    pause, 
-    stop: stopPlayer,
-    setVolume: setPlayerVolume,
-    destroy 
-  } = useYouTubePlayer();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
+  // Textos traduzidos
+  const texts = {
+    title: isUSA ? 'Soothing Sounds momzen' : 'Sons Calmantes mamaezen',
+    description: isUSA 
+      ? 'Premium high-quality audio to calm and help baby sleep'
+      : 'Áudios premium em alta qualidade para acalmar e fazer o bebê dormir',
+    playing: isUSA ? '🎵 Playing...' : '🎵 Tocando...',
+    paused: isUSA ? '⏸️ Paused' : '⏸️ Pausado',
+    stopped: isUSA ? '⏹️ Stopped' : '⏹️ Parado',
+    premium: isUSA 
+      ? '✨ momzen Premium: High-quality audio, continuous playback without interruptions. Perfect for creating a calm environment.'
+      : '✨ mamaezen Premium: Áudios em alta qualidade, reprodução contínua sem interrupções. Perfeito para criar um ambiente tranquilo.',
+  };
+
+  // Limpa iframe ao desmontar
   useEffect(() => {
     return () => {
-      destroy();
+      if (iframeRef.current) {
+        iframeRef.current.src = '';
+        iframeRef.current.remove();
+        iframeRef.current = null;
+      }
     };
   }, []);
 
-  useEffect(() => {
-    if (isPlaying) {
-      setPlayerVolume(volume[0]);
-    }
-  }, [volume, isPlaying]);
+  const createPlayer = useCallback((videoId: string) => {
+    const container = containerRef.current;
+    if (!container) return;
 
-  const handleSoundSelect = async (sound: Sound) => {
+    // Remove iframe anterior
+    if (iframeRef.current) {
+      iframeRef.current.src = '';
+      iframeRef.current.remove();
+      iframeRef.current = null;
+    }
+
+    // Cria novo iframe otimizado para iOS/Android
+    const iframe = document.createElement('iframe');
+    iframe.id = `sound-player-${Date.now()}`;
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('playsinline', '');
+    iframe.style.cssText = 'width:1px;height:1px;position:absolute;opacity:0;pointer-events:none;';
+    
+    const params = new URLSearchParams({
+      autoplay: '1',
+      mute: '0',
+      controls: '0',
+      disablekb: '1',
+      fs: '0',
+      modestbranding: '1',
+      playsinline: '1',
+      rel: '0',
+      showinfo: '0',
+      iv_load_policy: '3',
+      loop: '1',
+      playlist: videoId,
+      enablejsapi: '1',
+      origin: window.location.origin,
+    });
+
+    iframe.src = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+    container.appendChild(iframe);
+    iframeRef.current = iframe;
+    setIsPlaying(true);
+  }, []);
+
+  const handleSoundSelect = (sound: Sound) => {
     if (currentSound?.id === sound.id) {
       // Toggle play/pause
       if (isPlaying) {
-        pause();
+        if (iframeRef.current) {
+          iframeRef.current.src = '';
+        }
+        setIsPlaying(false);
       } else {
-        play();
+        createPlayer(sound.youtubeId);
       }
     } else {
       // Troca de som
-      if (!isAPIReady) {
-        toast({
-          title: 'Carregando player do YouTube',
-          description: 'Aguarde 1 segundo e toque novamente no som.',
-        });
-        return;
-      }
-
       setCurrentSound(sound);
-
-      initializePlayer({
-        videoId: sound.youtubeId,
-        volume: volume[0],
-        onReady: () => {
-          toast({
-            title: `🎵 ${sound.name}`,
-            description: `${sound.description} - ${sound.quality}`,
-          });
-        },
+      createPlayer(sound.youtubeId);
+      
+      const name = isUSA ? sound.nameEN : sound.name;
+      const desc = isUSA ? sound.descriptionEN : sound.description;
+      toast({
+        title: `🎵 ${name}`,
+        description: `${desc} - ${sound.quality}`,
       });
     }
   };
 
   const handleStop = () => {
-    stopPlayer();
-    destroy();
+    if (iframeRef.current) {
+      iframeRef.current.src = '';
+      iframeRef.current.remove();
+      iframeRef.current = null;
+    }
     setCurrentSound(null);
+    setIsPlaying(false);
     toast({
-      title: "⏹️ Som parado",
-      description: "Reprodução encerrada",
+      title: texts.stopped,
+      description: isUSA ? "Playback ended" : "Reprodução encerrada",
     });
   };
 
-  const handleVolumeChange = (newVolume: number[]) => {
-    setVolume(newVolume);
-    setPlayerVolume(newVolume[0]);
-  };
+  const getSoundName = (sound: Sound) => isUSA ? sound.nameEN : sound.name;
+  const getSoundDesc = (sound: Sound) => isUSA ? sound.descriptionEN : sound.description;
 
   return (
-    <Card className="border-primary/20 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Music className="w-5 h-5" />
-          Sons Calmantes mamaezen
+    <Card className="border-pink-500/20 shadow-lg bg-gradient-to-br from-purple-900/40 to-pink-900/40">
+      <CardHeader className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 pb-3">
+        <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <Music className="w-5 h-5 text-pink-400" />
+          {texts.title}
         </CardTitle>
-        <CardDescription className="text-xs">
-          Áudios premium em alta qualidade para acalmar e fazer o bebê dormir
+        <CardDescription className="text-xs text-pink-200/70">
+          {texts.description}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
-        {/* Container invisível para o player do YouTube (fora da tela, mas ativo) */}
+        {/* Container invisível para o player */}
         <div
-          id={containerRef}
+          ref={containerRef}
           style={{
             position: 'fixed',
             bottom: 0,
@@ -172,17 +228,21 @@ export default function BabySounds() {
             <Button
               key={sound.id}
               variant={currentSound?.id === sound.id ? "default" : "outline"}
-              className="h-auto flex-col gap-1 p-3 relative text-xs"
+              className={`h-auto flex-col gap-1 p-3 relative text-xs transition-all ${
+                currentSound?.id === sound.id 
+                  ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white border-0 shadow-lg shadow-pink-500/30' 
+                  : 'border-purple-500/30 text-pink-200 hover:bg-purple-500/20 hover:text-white'
+              }`}
               onClick={() => handleSoundSelect(sound)}
             >
               <span className="text-2xl">{sound.icon}</span>
               <div className="text-center">
-                <div className="font-semibold text-xs leading-tight">{sound.name}</div>
+                <div className="font-semibold text-xs leading-tight">{getSoundName(sound)}</div>
                 <div className="text-[10px] opacity-70 mt-0.5">{sound.quality}</div>
               </div>
               {currentSound?.id === sound.id && isPlaying && (
                 <div className="absolute top-1 right-1">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                 </div>
               )}
             </Button>
@@ -190,23 +250,26 @@ export default function BabySounds() {
         </div>
 
         {currentSound && (
-          <div className="space-y-3 p-3 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
+          <div className="space-y-3 p-3 rounded-lg bg-[#1e1b4b] border border-purple-500/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-xl">{currentSound.icon}</span>
                 <div>
-                  <p className="font-semibold text-sm">{currentSound.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {isPlaying ? "🎵 Tocando..." : "⏸️ Pausado"} • {currentSound.quality}
+                  <p className="font-semibold text-sm text-white">{getSoundName(currentSound)}</p>
+                  <p className="text-xs text-pink-200/70">
+                    {isPlaying ? texts.playing : texts.paused} • {currentSound.quality}
                   </p>
                 </div>
               </div>
               <div className="flex gap-1.5">
                 <Button
                   size="icon"
-                  variant={isPlaying ? "default" : "outline"}
+                  className={`h-8 w-8 ${
+                    isPlaying 
+                      ? 'bg-white text-purple-900 hover:bg-white/90' 
+                      : 'bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600'
+                  }`}
                   onClick={() => handleSoundSelect(currentSound)}
-                  className="h-8 w-8"
                 >
                   {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                 </Button>
@@ -214,24 +277,24 @@ export default function BabySounds() {
                   size="icon"
                   variant="outline"
                   onClick={handleStop}
-                  className="h-8 w-8 text-xs"
+                  className="h-8 w-8 border-purple-500/30 text-pink-200 hover:bg-purple-500/20"
                 >
-                  ⏹️
+                  <Square className="w-3 h-3" />
                 </Button>
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <Volume2 className="w-3 h-3 text-muted-foreground" />
+                <Volume2 className="w-3 h-3 text-pink-200/70" />
                 <Slider
                   value={volume}
-                  onValueChange={handleVolumeChange}
+                  onValueChange={setVolume}
                   max={100}
                   step={1}
                   className="flex-1"
                 />
-                <span className="text-xs text-muted-foreground w-10 text-right">
+                <span className="text-xs text-pink-200/70 w-10 text-right">
                   {volume[0]}%
                 </span>
               </div>
@@ -239,9 +302,9 @@ export default function BabySounds() {
           </div>
         )}
 
-        <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <p className="text-xs">
-            <strong>✨ mamaezen Premium:</strong> Áudios em alta qualidade, reprodução contínua sem interrupções. Perfeito para criar um ambiente tranquilo.
+        <div className="mt-4 p-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg border border-yellow-500/20">
+          <p className="text-xs text-yellow-200">
+            <strong className="text-yellow-400">✨</strong> {texts.premium}
           </p>
         </div>
       </CardContent>
