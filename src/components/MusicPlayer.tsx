@@ -125,8 +125,8 @@ const MusicPlayer = () => {
     found: isUSA ? 'Found' : 'Encontradas',
     musics: isUSA ? 'songs' : 'músicas',
     iosTip: isUSA
-      ? '📱 iPhone: If sound doesn\'t play, tap the player and press play on the video'
-      : '📱 iPhone: Se o som não tocar, toque no player e aperte play no vídeo',
+      ? '📱 iPhone: Tap the PLAY button on the video player above to start'
+      : '📱 iPhone: Toque no botão PLAY do player de vídeo acima para iniciar',
   };
 
   // Limpa iframe ao desmontar
@@ -159,19 +159,20 @@ const MusicPlayer = () => {
     iframe.setAttribute('playsinline', 'true');
     iframe.setAttribute('frameborder', '0');
     
-    // Para iOS, mostramos um player pequeno visível
+    // iOS precisa de player visível e controles para o usuário iniciar
     if (isIOS) {
-      iframe.style.cssText = 'width:100%;height:60px;border-radius:8px;';
+      iframe.style.cssText = 'width:100%;height:200px;border-radius:12px;background:#000;';
       setShowPlayer(true);
     } else {
       iframe.style.cssText = 'width:1px;height:1px;position:absolute;opacity:0;pointer-events:none;';
       setShowPlayer(false);
     }
     
+    // iOS: não usar autoplay, mostrar controles nativos do YouTube
     const params = new URLSearchParams({
-      autoplay: '1',
+      autoplay: isIOS ? '0' : '1',
       mute: '0',
-      controls: isIOS ? '1' : '0',
+      controls: '1', // Sempre mostrar controles
       playsinline: '1',
       rel: '0',
       modestbranding: '1',
@@ -181,10 +182,11 @@ const MusicPlayer = () => {
       origin: window.location.origin,
     });
 
-    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+    // Usar youtube.com normal (não nocookie) para melhor compatibilidade iOS
+    iframe.src = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
     container.appendChild(iframe);
     iframeRef.current = iframe;
-    setIsPlaying(true);
+    setIsPlaying(!isIOS); // No iOS, usuário precisa clicar play no player
   }, [isIOS]);
 
   const handleSearch = async () => {
@@ -267,20 +269,32 @@ const MusicPlayer = () => {
 
   return (
     <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-purple-950/90 via-pink-950/90 to-blue-950/90">
-      {/* Container do YouTube Player */}
-      <div
-        ref={containerRef}
-        className={showPlayer ? 'mx-4 mt-4 rounded-lg overflow-hidden' : ''}
-        style={showPlayer ? {} : {
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '1px',
-          height: '1px',
-          opacity: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Container do YouTube Player - Visível no iOS */}
+      {showPlayer && isIOS && (
+        <div className="mx-4 mt-4">
+          <div className="rounded-xl overflow-hidden shadow-lg border border-white/10">
+            <div ref={containerRef} />
+          </div>
+          <p className="text-center text-xs text-pink-300 mt-2 animate-pulse">
+            👆 {isUSA ? 'Tap play on the video above' : 'Toque play no vídeo acima'}
+          </p>
+        </div>
+      )}
+      {/* Container oculto para Android */}
+      {!isIOS && (
+        <div
+          ref={containerRef}
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {/* Header */}
       <div className="bg-gradient-to-b from-black/40 to-transparent p-6 pb-4">

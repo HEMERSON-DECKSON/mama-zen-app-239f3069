@@ -109,8 +109,8 @@ export default function BabySounds() {
       ? '✨ momzen Premium: High-quality audio, continuous playback without interruptions. Perfect for creating a calm environment.'
       : '✨ mamaezen Premium: Áudios em alta qualidade, reprodução contínua sem interrupções. Perfeito para criar um ambiente tranquilo.',
     iosTip: isUSA
-      ? '📱 iPhone: If sound doesn\'t play, tap the player below and press play on the video'
-      : '📱 iPhone: Se o som não tocar, toque no player abaixo e aperte play no vídeo',
+      ? '📱 iPhone: Tap the PLAY button on the video player below to start'
+      : '📱 iPhone: Toque no botão PLAY do player de vídeo abaixo para iniciar',
   };
 
   // Limpa iframe ao desmontar
@@ -143,20 +143,20 @@ export default function BabySounds() {
     iframe.setAttribute('playsinline', 'true');
     iframe.setAttribute('frameborder', '0');
     
-    // Para iOS, mostramos um player pequeno visível para o usuário poder interagir
+    // iOS precisa de player visível e maior para o usuário clicar play
     if (isIOS) {
-      iframe.style.cssText = 'width:100%;height:60px;border-radius:8px;';
+      iframe.style.cssText = 'width:100%;height:180px;border-radius:12px;background:#000;';
       setShowPlayer(true);
     } else {
       iframe.style.cssText = 'width:1px;height:1px;position:absolute;opacity:0;pointer-events:none;';
       setShowPlayer(false);
     }
     
-    // Parâmetros otimizados para mobile
+    // iOS: não usar autoplay, mostrar controles nativos do YouTube
     const params = new URLSearchParams({
-      autoplay: '1',
+      autoplay: isIOS ? '0' : '1',
       mute: '0',
-      controls: isIOS ? '1' : '0', // iOS precisa de controles visíveis
+      controls: '1', // Sempre mostrar controles
       playsinline: '1',
       rel: '0',
       modestbranding: '1',
@@ -166,11 +166,11 @@ export default function BabySounds() {
       origin: window.location.origin,
     });
 
-    // Usar youtube-nocookie para melhor privacidade
-    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+    // Usar youtube.com normal para melhor compatibilidade iOS
+    iframe.src = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
     container.appendChild(iframe);
     iframeRef.current = iframe;
-    setIsPlaying(true);
+    setIsPlaying(!isIOS); // No iOS, usuário precisa clicar play no player
   }, [isIOS]);
 
   const handleSoundSelect = (sound: Sound) => {
@@ -229,22 +229,34 @@ export default function BabySounds() {
       </CardHeader>
       <CardContent className="pt-4">
         {/* Container para o player - visível no iOS */}
-        <div
-          ref={containerRef}
-          className={showPlayer ? 'mb-4 rounded-lg overflow-hidden' : ''}
-          style={showPlayer ? {} : {
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '1px',
-            height: '1px',
-            opacity: 0,
-            pointerEvents: 'none',
-          }}
-        />
+        {showPlayer && isIOS && (
+          <div className="mb-4">
+            <div className="rounded-xl overflow-hidden shadow-lg border border-white/10">
+              <div ref={containerRef} />
+            </div>
+            <p className="text-center text-xs text-pink-300 mt-2 animate-pulse">
+              👆 {isUSA ? 'Tap play on the video above' : 'Toque play no vídeo acima'}
+            </p>
+          </div>
+        )}
+        {/* Container oculto para Android */}
+        {!isIOS && (
+          <div
+            ref={containerRef}
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              width: '1px',
+              height: '1px',
+              opacity: 0,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
 
         {/* Dica para iOS */}
-        {isIOS && currentSound && (
+        {isIOS && currentSound && !showPlayer && (
           <div className="mb-4 p-2 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-blue-200">{texts.iosTip}</p>
