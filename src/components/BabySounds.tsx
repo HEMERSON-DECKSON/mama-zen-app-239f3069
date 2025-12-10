@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, Music, Square } from "lucide-react";
+import { Play, Pause, Volume2, Music, Square, AlertCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 
@@ -85,8 +85,16 @@ export default function BabySounds() {
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
+  const [showPlayer, setShowPlayer] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  // Detecta iOS
+  useEffect(() => {
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    setIsIOS(iOS);
+  }, []);
 
   // Textos traduzidos
   const texts = {
@@ -100,6 +108,9 @@ export default function BabySounds() {
     premium: isUSA 
       ? '✨ momzen Premium: High-quality audio, continuous playback without interruptions. Perfect for creating a calm environment.'
       : '✨ mamaezen Premium: Áudios em alta qualidade, reprodução contínua sem interrupções. Perfeito para criar um ambiente tranquilo.',
+    iosTip: isUSA
+      ? '📱 iPhone: If sound doesn\'t play, tap the player below and press play on the video'
+      : '📱 iPhone: Se o som não tocar, toque no player abaixo e aperte play no vídeo',
   };
 
   // Limpa iframe ao desmontar
@@ -124,36 +135,43 @@ export default function BabySounds() {
       iframeRef.current = null;
     }
 
-    // Cria novo iframe otimizado para iOS/Android
+    // Cria novo iframe
     const iframe = document.createElement('iframe');
     iframe.id = `sound-player-${Date.now()}`;
-    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('playsinline', '');
-    iframe.style.cssText = 'width:1px;height:1px;position:absolute;opacity:0;pointer-events:none;';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.setAttribute('allowfullscreen', 'true');
+    iframe.setAttribute('playsinline', 'true');
+    iframe.setAttribute('frameborder', '0');
     
+    // Para iOS, mostramos um player pequeno visível para o usuário poder interagir
+    if (isIOS) {
+      iframe.style.cssText = 'width:100%;height:60px;border-radius:8px;';
+      setShowPlayer(true);
+    } else {
+      iframe.style.cssText = 'width:1px;height:1px;position:absolute;opacity:0;pointer-events:none;';
+      setShowPlayer(false);
+    }
+    
+    // Parâmetros otimizados para mobile
     const params = new URLSearchParams({
       autoplay: '1',
       mute: '0',
-      controls: '0',
-      disablekb: '1',
-      fs: '0',
-      modestbranding: '1',
+      controls: isIOS ? '1' : '0', // iOS precisa de controles visíveis
       playsinline: '1',
       rel: '0',
-      showinfo: '0',
-      iv_load_policy: '3',
+      modestbranding: '1',
       loop: '1',
       playlist: videoId,
       enablejsapi: '1',
       origin: window.location.origin,
     });
 
-    iframe.src = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+    // Usar youtube-nocookie para melhor privacidade
+    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
     container.appendChild(iframe);
     iframeRef.current = iframe;
     setIsPlaying(true);
-  }, []);
+  }, [isIOS]);
 
   const handleSoundSelect = (sound: Sound) => {
     if (currentSound?.id === sound.id) {
@@ -163,6 +181,7 @@ export default function BabySounds() {
           iframeRef.current.src = '';
         }
         setIsPlaying(false);
+        setShowPlayer(false);
       } else {
         createPlayer(sound.youtubeId);
       }
@@ -188,6 +207,7 @@ export default function BabySounds() {
     }
     setCurrentSound(null);
     setIsPlaying(false);
+    setShowPlayer(false);
     toast({
       title: texts.stopped,
       description: isUSA ? "Playback ended" : "Reprodução encerrada",
@@ -195,7 +215,6 @@ export default function BabySounds() {
   };
 
   const getSoundName = (sound: Sound) => isUSA ? sound.nameEN : sound.name;
-  const getSoundDesc = (sound: Sound) => isUSA ? sound.descriptionEN : sound.description;
 
   return (
     <Card className="border-pink-500/20 shadow-lg bg-gradient-to-br from-purple-900/40 to-pink-900/40">
@@ -209,10 +228,11 @@ export default function BabySounds() {
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
-        {/* Container invisível para o player */}
+        {/* Container para o player - visível no iOS */}
         <div
           ref={containerRef}
-          style={{
+          className={showPlayer ? 'mb-4 rounded-lg overflow-hidden' : ''}
+          style={showPlayer ? {} : {
             position: 'fixed',
             bottom: 0,
             left: 0,
@@ -222,6 +242,14 @@ export default function BabySounds() {
             pointerEvents: 'none',
           }}
         />
+
+        {/* Dica para iOS */}
+        {isIOS && currentSound && (
+          <div className="mb-4 p-2 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-200">{texts.iosTip}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-2 mb-4">
           {babySounds.map((sound) => (
